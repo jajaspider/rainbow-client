@@ -1,0 +1,9 @@
+# projects
+node_modules/
+package-lock.json
+
+# mac_os
+.DS_Store
+
+# 
+*.develop.yaml

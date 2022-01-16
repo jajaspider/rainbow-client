@@ -23,7 +23,7 @@ async function exec(methodObj, chat, author) {
           type: "sendChat",
           result: data.payload.message,
         };
-      } else if (chatLength == 1) {
+      } else if (chatLength >= 1) {
         console.dir("여긴 post");
         let type = _.get(methodObj, "params.type");
         if (type == "channel") {
@@ -43,12 +43,6 @@ async function exec(methodObj, chat, author) {
         return {
           type: "sendChat",
           result: data.payload.message,
-        };
-      } else {
-        console.dir("여긴 에러아니면 빈값");
-        return {
-          type: "sendChat",
-          result: "잘못입력하셨습니다.",
         };
       }
   }

@@ -1,5 +1,7 @@
 const _ = require("lodash");
 const axios = require("axios");
+const Common = require("../models/index").Common;
+const async = require("async");
 
 async function exec(methodObj, chat, author) {
   let command = _.get(methodObj, "name");
@@ -45,6 +47,28 @@ async function exec(methodObj, chat, author) {
           result: data.payload.message,
         };
       }
+      break;
+    case "help":
+      let commonMethods = await Common.find({}).lean();
+
+      let result = "[기본 명령어]\n";
+      try {
+        await async.mapLimit(commonMethods, 5, async (methods) => {
+          let method = _.get(methods, "method");
+          let alias = _.get(methods, "alias");
+          let description = _.get(methods, "description");
+          result += `\n명령어 : ${method}\n대체 명령어 : ${alias}\n설명 : ${description}`;
+        });
+      } catch (e) {
+        console.dir(e);
+      }
+
+      console.dir(result);
+
+      return {
+        type: "sendChat",
+        result,
+      };
   }
 }
 

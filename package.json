@@ -6,6 +6,7 @@
         "start": "node ./src/index.js"
     },
     "dependencies": {
+        "async": "^3.2.3",
         "axios": "^0.24.0",
         "js-yaml": "^4.1.0",
         "lodash": "^4.17.21",

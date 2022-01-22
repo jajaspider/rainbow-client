@@ -15,7 +15,7 @@ async function router(data, channel) {
     let author = _.get(sender, "nickname");
 
     // 오픈 카톡방이 아니므로 생략처리
-    if (_.get(sender, 'userType') != 1000) {
+    if ((_.get(sender, 'userType') != 1000) || !_.get(sender, 'linkId')) {
       return runMethod;
     }
 
@@ -25,7 +25,7 @@ async function router(data, channel) {
     }
 
     let roomNumber = _.get(channel, "_channel.channelId").toString();
-    let userNumber = _.get(sender, 'openToken');
+    let userNumber = _.get(sender, 'linkId').toString();
 
     let command = chat.replace(commandPrefix, "").split(" ")[0];
     chat = chat.replace(`${commandPrefix}${command}`, "").trim();

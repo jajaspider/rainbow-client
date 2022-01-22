@@ -22,8 +22,6 @@ async function router(data, channel) {
     let userNumber = null;
     try {
       userNumber = _.get(sender, 'linkId').toString();
-      console.dir(userNumber);
-
     } catch (e) {
 
     }

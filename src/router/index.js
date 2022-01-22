@@ -3,6 +3,7 @@ const commonRouter = require("./common");
 const permissionRouter = require("./permission");
 const manageRouter = require("./manage");
 const maplestoryRouter = require("./maplestory");
+const lostarkRouter = require("./lostark");
 // const Room = require("../models/index").Room;
 
 async function router(data, channel) {
@@ -40,7 +41,11 @@ async function router(data, channel) {
     }
 
     if (_.includes(roomTypes, 'maplestory')) {
-      runMethod.push(await maplestoryRouter.router(command, chat, channel));
+      runMethod.push(await maplestoryRouter.router(command, chat, author));
+    }
+
+    if (_.includes(roomTypes, 'lostark')) {
+      runMethod.push(await lostarkRouter.router(command, chat, author));
     }
 
     return runMethod;

@@ -5,6 +5,7 @@ const commonSchema = require('./common');
 const permissionSchema = require('./permission');
 const manageSchema = require('./manage');
 const maplestorySchema = require('./maplestory');
+const lostarkSchema = require('./lostark');
 
 // const Selection = mongoose.model('Selection', selectionSchema);
 
@@ -14,4 +15,5 @@ module.exports = {
     Permission: permissionSchema,
     Manage: manageSchema,
     Maplestory: maplestorySchema,
+    Lostark: lostarkSchema,
 }

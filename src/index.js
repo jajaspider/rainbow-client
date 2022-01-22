@@ -16,6 +16,9 @@ const {
 } = require('./router');
 const _ = require('lodash');
 const mongoose = require('mongoose');
+const {
+    sleep
+} = require("./utils");
 
 let configPath = path.join(process.cwd(), 'config', 'rainbow.develop.yaml');
 let config = yaml.load(fs.readFileSync(configPath));
@@ -54,6 +57,7 @@ CLIENT.on('chat', async (data, channel) => {
         let type = _.get(result, 'type');
         if (type == 'sendChat') {
             await channel.sendChat(_.get(result, 'result'));
+            await sleep(1000);
         } else if (type == 'reply') {
             // 현재 동작하지않음 2021.01.16
             await channel.sendChat(
@@ -61,7 +65,6 @@ CLIENT.on('chat', async (data, channel) => {
                 .append(new nodeKakao.ReplyContent(data.chat))
                 .text(_.get(result, 'result'))
                 .build(nodeKakao.KnownChatType.REPLY));
-
         }
     }
 

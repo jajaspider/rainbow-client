@@ -8,9 +8,7 @@ async function exec(methodObj, chat, author) {
   switch (command) {
     case "selection":
       let chatLength = chat.split(" ").length;
-      console.dir(chat);
       if (chat == "") {
-        console.dir("여긴 get");
         let type = _.get(methodObj, "params.type");
         let result = await axios.get(
           `http://localhost:30003/v0/${command}/${type}`
@@ -26,7 +24,6 @@ async function exec(methodObj, chat, author) {
           result: data.payload.message,
         };
       } else if (chatLength >= 1) {
-        console.dir("여긴 post");
         let type = _.get(methodObj, "params.type");
         if (type == "channel") {
           return;
@@ -57,17 +54,15 @@ async function exec(methodObj, chat, author) {
           let method = _.get(methods, "method");
           let alias = _.get(methods, "alias");
           let description = _.get(methods, "description");
-          result += `\n명령어 : ${method}\n대체 명령어 : ${alias}\n설명 : ${description}`;
+          result += `\n\n명령어 : ${method}\n대체 명령어 : ${alias}\n설명 : ${description}`;
         });
       } catch (e) {
         console.dir(e);
       }
 
-      console.dir(result);
-
       return {
         type: "sendChat",
-        result,
+          result,
       };
   }
 }

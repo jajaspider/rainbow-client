@@ -31,7 +31,7 @@ async function exec(methodObj, chat, author) {
 
             let maplestoryMethods = await Maplestory.find({}).lean();
 
-            let result = "[메이플 스토리 명령어]\n";
+            let result = "[메이플스토리 명령어]\n";
             try {
                 await async.mapLimit(maplestoryMethods, 5, async (methods) => {
                     let method = _.get(methods, "method");

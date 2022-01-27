@@ -31,9 +31,9 @@ async function exec(methodObj, chat, author) {
         case 'info':
             let url = null;
             if (chat == '') {
-                url = `http://192.168.1.142:30003/v0/lostark/info/${encodeURIComponent(author)}`;
+                url = `http://localhost:30003/v0/lostark/info/${encodeURIComponent(author)}`;
             } else if (chatLength == 1) {
-                url = `http://192.168.1.142:30003/v0/lostark/info/${encodeURIComponent(chat)}`;
+                url = `http://localhost:30003/v0/lostark/info/${encodeURIComponent(chat)}`;
             }
             let request = await axios.get(url);
             if (request.status != 200) {

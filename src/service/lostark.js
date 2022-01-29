@@ -24,7 +24,7 @@ async function exec(methodObj, chat, author) {
 
             return {
                 type: "sendChat",
-                result,
+                    result,
             };
 
             break;
@@ -66,7 +66,7 @@ async function exec(methodObj, chat, author) {
             info += `아이템레벨 : ${itemLevel}\n`;
             info += `공격력 : ${attack}\n`;
             info += `생명력 : ${health}\n`;
-            info += `길드:  : ${guildName}\n\n`;
+            info += `길드 : ${guildName}\n\n`;
 
             for (let specific of specificList) {
                 info += `${specific.specificName}(${specific.specificValue}) `;
@@ -84,7 +84,7 @@ async function exec(methodObj, chat, author) {
 
             return {
                 type: "sendChat",
-                result: info,
+                    result: info,
             };
 
         default:

@@ -6,6 +6,9 @@ const async = require("async");
 async function exec(methodObj, chat, author) {
     let command = _.get(methodObj, "name");
     let chatLength = chat.split(" ").length;
+    let response = null;
+    let responseData = null;
+    let errorMessage = null;
     switch (command) {
         case "help":
             let maplestoryMethods = await Lostark.find({}).lean();
@@ -26,8 +29,6 @@ async function exec(methodObj, chat, author) {
                 type: "sendChat",
                     result,
             };
-
-            break;
         case 'info':
             let url = null;
             if (chat == '') {
@@ -35,12 +36,12 @@ async function exec(methodObj, chat, author) {
             } else if (chatLength == 1) {
                 url = `http://localhost:30003/v0/lostark/info/${encodeURIComponent(chat)}`;
             }
-            let request = await axios.get(url);
-            if (request.status != 200) {
+            response = await axios.get(url);
+            if (response.status != 200) {
                 return {};
             }
-            let data = _.get(request, "data");
-            let errorMessage = _.get(data, 'payload.message');
+            responseData = _.get(response, "data");
+            errorMessage = _.get(responseData, 'payload.message');
             if (errorMessage) {
                 return {
                     type: "sendChat",
@@ -48,7 +49,7 @@ async function exec(methodObj, chat, author) {
                 }
             }
 
-            let character = _.get(data, 'payload.character');
+            let character = _.get(responseData, 'payload.character');
             let server = _.get(character, 'server');
             let nickname = _.get(character, 'nickname');
             let job = _.get(character, 'job');
@@ -86,6 +87,30 @@ async function exec(methodObj, chat, author) {
                 type: "sendChat",
                     result: info,
             };
+
+        case "crystal":
+            response = await axios.get(`http://localhost:30003/v0/lostark/crystal`);
+            if (response.status != 200) {
+                return {};
+            }
+            responseData = _.get(response, "data");
+            errorMessage = _.get(responseData, 'payload.message');
+            if (errorMessage) {
+                return {
+                    type: "sendChat",
+                    result: errorMessage,
+                }
+            }
+            let crystal = _.get(responseData, 'payload.result');
+
+            let crystalInfo = `[크리스탈 시세]\n`
+            crystalInfo += `사실때 : ${_.get(crystal,'buyPrice')}\n`;
+            crystalInfo += `파실때 : ${_.get(crystal,'sellPrice')}\n`;
+            return {
+                type: "sendChat",
+                    result: crystalInfo,
+            };
+
 
         default:
             break;

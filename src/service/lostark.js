@@ -9,6 +9,7 @@ async function exec(methodObj, chat, author) {
     let response = null;
     let responseData = null;
     let errorMessage = null;
+    let url = null;
     switch (command) {
         case "help":
             let maplestoryMethods = await Lostark.find({}).lean();
@@ -30,7 +31,6 @@ async function exec(methodObj, chat, author) {
                     result,
             };
         case 'info':
-            let url = null;
             if (chat == '') {
                 url = `http://localhost:30003/v0/lostark/info/${encodeURIComponent(author)}`;
             } else if (chatLength == 1) {
@@ -109,6 +109,37 @@ async function exec(methodObj, chat, author) {
             return {
                 type: "sendChat",
                     result: crystalInfo,
+            };
+
+        case "expand":
+            if (chat == '') {
+                url = `http://localhost:30003/v0/lostark/expand/${encodeURIComponent(author)}`;
+            } else if (chatLength == 1) {
+                url = `http://localhost:30003/v0/lostark/expand/${encodeURIComponent(chat)}`;
+            }
+            response = await axios.get(url);
+            if (response.status != 200) {
+                return {};
+            }
+            responseData = _.get(response, "data");
+            errorMessage = _.get(responseData, 'payload.message');
+            if (errorMessage) {
+                return {
+                    type: "sendChat",
+                    result: errorMessage,
+                }
+            }
+            let expandList = _.get(responseData, 'payload.result');
+
+            let expandInfo = `[보유 캐릭터 정보]\n`
+
+            for (let expand of expandList) {
+                expandInfo += `${_.get(expand, 'server')} : ${_.get(expand, 'characterList')}\n`;
+            }
+
+            return {
+                type: "sendChat",
+                    result: expandInfo,
             };
 
 

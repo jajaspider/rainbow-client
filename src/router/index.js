@@ -13,6 +13,7 @@ async function router(data, channel) {
     let chat = data.text;
     let sender = data.getSenderInfo(channel);
     let author = _.get(sender, "nickname");
+    author = String(author).split("/")[0].trim();
 
     // 오픈 카톡방이 아니므로 생략처리
     if (_.get(sender, 'userType') != 1000) {

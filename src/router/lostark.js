@@ -10,7 +10,7 @@ async function router(command, chat, author) {
 
     if (_.isEmpty(result)) {
         result = await Lostark.find({
-            alias: [command],
+            alias: command,
         }).lean();
     }
 

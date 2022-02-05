@@ -5,6 +5,11 @@ const async = require("async");
 
 async function exec(methodObj, chat, author) {
     let command = _.get(methodObj, "name");
+    let chatLength = chat.split(" ").length;
+    let response = null;
+    let responseData = null;
+    let errorMessage = null;
+    let url = null;
     switch (command) {
         case "help":
             let maplestoryMethods = await Lostark.find({}).lean();
@@ -25,6 +30,118 @@ async function exec(methodObj, chat, author) {
                 type: "sendChat",
                     result,
             };
+        case 'info':
+            if (chat == '') {
+                url = `http://localhost:30003/v0/lostark/info/${encodeURIComponent(author)}`;
+            } else if (chatLength == 1) {
+                url = `http://localhost:30003/v0/lostark/info/${encodeURIComponent(chat)}`;
+            }
+            response = await axios.get(url);
+            if (response.status != 200) {
+                return {};
+            }
+            responseData = _.get(response, "data");
+            errorMessage = _.get(responseData, 'payload.message');
+            if (errorMessage) {
+                return {
+                    type: "sendChat",
+                    result: errorMessage,
+                }
+            }
+
+            let character = _.get(responseData, 'payload.character');
+            let server = _.get(character, 'server');
+            let nickname = _.get(character, 'nickname');
+            let job = _.get(character, 'job');
+            let fightLevel = _.get(character, 'fightLevel');
+            let itemLevel = _.get(character, 'itemLevel');
+            let attack = _.get(character, 'attack');
+            let health = _.get(character, 'health');
+            let specificList = _.get(character, 'specificList');
+            let guildName = _.get(character, 'guildName');
+            let engraveList = _.get(character, 'engraveList');
+            let cardList = _.get(character, 'cardList');
+
+            let info = `${nickname} - ${server} | ${job}\n`;
+            info += `전투레벨 : ${fightLevel}\n`;
+            info += `아이템레벨 : ${itemLevel}\n`;
+            info += `공격력 : ${attack}\n`;
+            info += `생명력 : ${health}\n`;
+            info += `길드 : ${guildName}\n\n`;
+
+            for (let specific of specificList) {
+                info += `${specific.specificName}(${specific.specificValue}) `;
+            }
+            info += `\n\n`;
+
+            for (let engrave of engraveList) {
+                info += `${engrave}\n`;
+            }
+            // result += `\n`;
+
+            for (let card of cardList) {
+                info += `\n${card.cardSet} | ${card.cardSetValue}`;
+            }
+
+            return {
+                type: "sendChat",
+                    result: info,
+            };
+
+        case "crystal":
+            response = await axios.get(`http://localhost:30003/v0/lostark/crystal`);
+            if (response.status != 200) {
+                return {};
+            }
+            responseData = _.get(response, "data");
+            errorMessage = _.get(responseData, 'payload.message');
+            if (errorMessage) {
+                return {
+                    type: "sendChat",
+                    result: errorMessage,
+                }
+            }
+            let crystal = _.get(responseData, 'payload.result');
+
+            let crystalInfo = `[크리스탈 시세]\n`
+            crystalInfo += `사실때 : ${_.get(crystal,'buyPrice')}\n`;
+            crystalInfo += `파실때 : ${_.get(crystal,'sellPrice')}\n`;
+            return {
+                type: "sendChat",
+                    result: crystalInfo,
+            };
+
+        case "expand":
+            if (chat == '') {
+                url = `http://localhost:30003/v0/lostark/expand/${encodeURIComponent(author)}`;
+            } else if (chatLength == 1) {
+                url = `http://localhost:30003/v0/lostark/expand/${encodeURIComponent(chat)}`;
+            }
+            response = await axios.get(url);
+            if (response.status != 200) {
+                return {};
+            }
+            responseData = _.get(response, "data");
+            errorMessage = _.get(responseData, 'payload.message');
+            if (errorMessage) {
+                return {
+                    type: "sendChat",
+                    result: errorMessage,
+                }
+            }
+            let expandList = _.get(responseData, 'payload.result');
+
+            let expandInfo = `[보유 캐릭터 정보]\n`
+
+            for (let expand of expandList) {
+                expandInfo += `${_.get(expand, 'server')} : ${_.get(expand, 'characterList')}\n`;
+            }
+
+            return {
+                type: "sendChat",
+                    result: expandInfo,
+            };
+
 
         default:
             break;

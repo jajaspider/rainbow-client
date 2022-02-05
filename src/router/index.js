@@ -49,7 +49,7 @@ async function router(data, channel) {
     let roomTypes = await permissionRouter.router(roomNumber);
 
     if (_.includes(roomTypes, 'maplestory')) {
-      runMethod.push(await maplestoryRouter.router(command, chat, author));
+      runMethod.push(await maplestoryRouter.router(command, chat, channel));
     }
 
     if (_.includes(roomTypes, 'lostark')) {

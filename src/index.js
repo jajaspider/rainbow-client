@@ -19,6 +19,8 @@ const mongoose = require('mongoose');
 const {
     sleep
 } = require("./utils");
+const KakaoLink = require('kakao-link');
+
 
 let configPath = path.join(process.cwd(), 'config', 'rainbow.develop.yaml');
 let config = yaml.load(fs.readFileSync(configPath));
@@ -46,6 +48,11 @@ mongoose
     });
 
 const CLIENT = new nodeKakao.TalkClient();
+let kakaoLink = null;
+async function kakaoLogin() {
+    kakaoLink = new KakaoLink('d662864eb6a3efa5a93c7cddb665b142', 'http://sonaapi.com');
+    await kakaoLink.login('sonaapi17@gmail.com', 'maple.support');
+}
 
 CLIENT.on('chat', async (data, channel) => {
     const sender = data.getSenderInfo(channel);
@@ -65,6 +72,15 @@ CLIENT.on('chat', async (data, channel) => {
                 .append(new nodeKakao.ReplyContent(data.chat))
                 .text(_.get(result, 'result'))
                 .build(nodeKakao.KnownChatType.REPLY));
+        } else if (type == 'kakaolink') {
+            await kakaoLink.send(
+                `${_.get(result, 'result.roomName')}`, {
+                    link_ver: '4.0',
+                    template_id: _.get(result, 'result.templateId'),
+                    template_args: _.get(result, 'result.templateArgs')
+                },
+                'custom'
+            );
         }
     }
 
@@ -97,7 +113,7 @@ async function main() {
 
     const res = await CLIENT.login(loginRes.result);
     if (!res.success) throw new Error(`Login failed with status: ${res.status}`);
-
+    kakaoLogin();
     console.log('Login success');
 }
 

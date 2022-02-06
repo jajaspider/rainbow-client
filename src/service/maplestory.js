@@ -97,6 +97,37 @@ async function exec(methodObj, chat, channel) {
                 },
             };
 
+        case 'starforce':
+            if (chatLength != 2) {
+                return {
+                    type: "sendChat",
+                    result: '잘못입력하셨습니다.',
+                }
+            }
+            let params = chat.split(" ");
+            let url = `http://localhost:30003/v0/maplestory/starfoce/${params[0]}/${params[1]}`;
+            response = await axios.get(url);
+            if (response.status != 200) {
+                return {
+                    type: "sendChat",
+                    result: 'api 데이터 수신 실패',
+                };
+            }
+            responseData = _.get(response, "data");
+            errorMessage = _.get(responseData, 'payload.message');
+            if (errorMessage) {
+                return {
+                    type: "sendChat",
+                    result: errorMessage,
+                }
+            }
+
+            let starforce = _.get(responseData, 'payload.starforce');
+            return {
+                type: "sendChat",
+                result: `방어구 ${params[1]}성 강화시\n스탯 : ${starforce.stat}\n공격력 : ${starforce.attack}`
+            }
+
         default:
             break;
     }

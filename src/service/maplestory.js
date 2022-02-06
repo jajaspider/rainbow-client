@@ -105,7 +105,7 @@ async function exec(methodObj, chat, channel) {
                 }
             }
             let params = chat.split(" ");
-            let url = `http://localhost:30003/v0/maplestory/starfoce/${params[0]}/${params[1]}`;
+            let url = `http://localhost:30003/v0/maplestory/starforce/${params[0]}/${params[1]}`;
             response = await axios.get(url);
             if (response.status != 200) {
                 return {

@@ -77,6 +77,8 @@ async function exec(methodObj, chat, channel) {
                 character_class: _.get(character, 'class'),
                 // character_exp: _.pick(character, 'exp'),
                 character_pop: _.get(character, 'pop'),
+                character_ranking1: _.get(character, 'ranking.current'),
+                character_ranking2: _.get(character, 'ranking.change'),
                 character_guild: _.get(character, 'guild'),
                 character_thumbnail: _.get(character, 'img'),
                 // server_thumbnail: _.pick(character, 'img'),

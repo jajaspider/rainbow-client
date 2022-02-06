@@ -46,7 +46,7 @@ async function exec(methodObj, chat, channel) {
 
             return {
                 type: "sendChat",
-                    result,
+                result,
             };
         case 'info':
             if (chat == '') {
@@ -80,19 +80,19 @@ async function exec(methodObj, chat, channel) {
                 character_guild: _.get(character, 'guild'),
                 character_thumbnail: _.get(character, 'img'),
                 // server_thumbnail: _.pick(character, 'img'),
-                character_dojang: `${_.get(character, 'dojang.stair')}`,
-                dojang_time: _.get(character, 'dojang.time'),
-                character_seed: `${_.get(character, 'seed.stair')}`,
-                seed_time: _.get(character, 'seed.time'),
+                character_dojang: _.get(character, 'dojang.stair', '-'),
+                dojang_time: _.get(character, 'dojang.time', '-'),
+                character_seed: _.get(character, 'seed.stair', '-'),
+                seed_time: _.get(character, 'seed.time', '-'),
             };
 
             return {
                 type: "kakaolink",
-                    result: {
-                        roomName,
-                        templateId,
-                        templateArgs
-                    },
+                result: {
+                    roomName,
+                    templateId,
+                    templateArgs
+                },
             };
 
         default:

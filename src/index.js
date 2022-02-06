@@ -49,9 +49,17 @@ mongoose
 
 const CLIENT = new nodeKakao.TalkClient();
 let kakaoLink = null;
+let kakaoLinkDate = null;
 async function kakaoLogin() {
-    kakaoLink = new KakaoLink('d662864eb6a3efa5a93c7cddb665b142', 'http://sonaapi.com');
-    await kakaoLink.login('sonaapi17@gmail.com', 'maple.support');
+    try {
+        kakaoLink = new KakaoLink('d662864eb6a3efa5a93c7cddb665b142', 'http://sonaapi.com');
+        await kakaoLink.login('sonaapi17@gmail.com', 'maple.support');
+        kakaoLinkDate = new Date().getDate();
+    }
+    catch (e) {
+        console.dir(e);
+        console.dir('로그인 실패');
+    }
 }
 
 CLIENT.on('chat', async (data, channel) => {
@@ -69,16 +77,21 @@ CLIENT.on('chat', async (data, channel) => {
             // 현재 동작하지않음 2021.01.16
             await channel.sendChat(
                 new nodeKakao.ChatBuilder()
-                .append(new nodeKakao.ReplyContent(data.chat))
-                .text(_.get(result, 'result'))
-                .build(nodeKakao.KnownChatType.REPLY));
+                    .append(new nodeKakao.ReplyContent(data.chat))
+                    .text(_.get(result, 'result'))
+                    .build(nodeKakao.KnownChatType.REPLY));
         } else if (type == 'kakaolink') {
+            // 2021.02.06
+            // 카링 재로그인 추가
+            if (kakaoLinkDate != new Date().getDate()) {
+                await kakaoLogin();
+            }
             await kakaoLink.send(
                 `${_.get(result, 'result.roomName')}`, {
-                    link_ver: '4.0',
-                    template_id: _.get(result, 'result.templateId'),
-                    template_args: _.get(result, 'result.templateArgs')
-                },
+                link_ver: '4.0',
+                template_id: _.get(result, 'result.templateId'),
+                template_args: _.get(result, 'result.templateArgs')
+            },
                 'custom'
             );
         }
@@ -113,7 +126,7 @@ async function main() {
 
     const res = await CLIENT.login(loginRes.result);
     if (!res.success) throw new Error(`Login failed with status: ${res.status}`);
-    kakaoLogin();
+    await kakaoLogin();
     console.log('Login success');
 }
 

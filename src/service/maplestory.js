@@ -131,6 +131,30 @@ async function exec(methodObj, chat, channel) {
                 result: `방어구 ${params[1]}성 강화시\n스탯 : ${starforce.stat}\n공격력 : ${starforce.attack}`
             }
 
+        case "growth":
+            console.dir(chat);
+            console.dir(chatLength);
+            if (chatLength == 1) {
+                let type = _.get(methodObj, "params.type");
+                let response = await axios({
+                    url: `http://localhost:30003/v0/maplestory/growth/${chat}`,
+                    method: 'get',
+                    data: {
+                        type
+                    }
+                })
+                if (response.status != 200) {
+                    return {};
+                }
+
+                responseData = _.get(response, "data");
+                return {
+                    type: "sendChat",
+                    result: responseData.payload.percent,
+                };
+            }
+            break;
+
         default:
             break;
     }

@@ -10,7 +10,7 @@ async function router(command, chat, channel) {
 
     if (_.isEmpty(result)) {
         result = await Maplestory.find({
-            alias: [command],
+            alias: command,
         }).lean();
     }
 

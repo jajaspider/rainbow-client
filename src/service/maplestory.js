@@ -7,6 +7,7 @@ async function exec(methodObj, chat, channel) {
     let roomName = channel.info.openLink.linkName;
     let command = _.get(methodObj, "name");
     let chatLength = chat.split(" ").length;
+    let url = null;
     switch (command) {
         case "selection":
             if (chat == "") {
@@ -49,11 +50,13 @@ async function exec(methodObj, chat, channel) {
                 result,
             };
         case 'info':
-            if (chat == '') {
-                url = `http://localhost:30003/v0/maplestory/info/${encodeURIComponent(author)}`;
-            } else if (chatLength == 1) {
-                url = `http://localhost:30003/v0/maplestory/info/${encodeURIComponent(chat)}`;
+            if (chat == "") {
+                return;
             }
+            else if (chatLength > 1) {
+                return;
+            }
+            url = `http://localhost:30003/v0/maplestory/info/${encodeURIComponent(chat)}`;
             response = await axios.get(url);
             if (response.status != 200) {
                 return {};
@@ -75,7 +78,7 @@ async function exec(methodObj, chat, channel) {
                 character_name: _.get(character, 'name'),
                 character_level: _.get(character, 'level'),
                 character_class: _.get(character, 'class'),
-                // character_exp: _.pick(character, 'exp'),
+                character_exp: _.get(character, 'exp'),
                 character_pop: _.get(character, 'pop'),
                 character_ranking1: _.get(character, 'ranking.current'),
                 character_ranking2: _.get(character, 'ranking.change'),
@@ -105,7 +108,7 @@ async function exec(methodObj, chat, channel) {
                 }
             }
             let params = chat.split(" ");
-            let url = `http://localhost:30003/v0/maplestory/starforce/${params[0]}/${params[1]}`;
+            url = `http://localhost:30003/v0/maplestory/starforce/${params[0]}/${params[1]}`;
             response = await axios.get(url);
             if (response.status != 200) {
                 return {
@@ -127,6 +130,30 @@ async function exec(methodObj, chat, channel) {
                 type: "sendChat",
                 result: `방어구 ${params[1]}성 강화시\n스탯 : ${starforce.stat}\n공격력 : ${starforce.attack}`
             }
+
+        case "growth":
+            console.dir(chat);
+            console.dir(chatLength);
+            if (chatLength == 1) {
+                let type = _.get(methodObj, "params.type");
+                let response = await axios({
+                    url: `http://localhost:30003/v0/maplestory/growth/${chat}`,
+                    method: 'get',
+                    data: {
+                        type
+                    }
+                })
+                if (response.status != 200) {
+                    return {};
+                }
+
+                responseData = _.get(response, "data");
+                return {
+                    type: "sendChat",
+                    result: responseData.payload.percent,
+                };
+            }
+            break;
 
         default:
             break;

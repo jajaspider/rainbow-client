@@ -2,7 +2,7 @@ const Manage = require("../models/index").Manage;
 const manageService = require("../service/manage");
 const _ = require("lodash");
 
-async function router(command, chat, channel) {
+async function router(command, chat, channelId) {
     let result = null;
     result = await Manage.find({
         method: command,
@@ -12,7 +12,7 @@ async function router(command, chat, channel) {
         return;
     }
 
-    return await manageService.exec(result[0], chat, channel);
+    await manageService.exec(result[0], chat, channelId);
 }
 
 module.exports = {

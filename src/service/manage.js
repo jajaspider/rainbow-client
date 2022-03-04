@@ -2,8 +2,11 @@ const _ = require("lodash");
 const axios = require("axios");
 const Permission = require("../models/index").Permission;
 const async = require("async");
+const {
+    chatEvent
+} = require('../core/eventBridge');
 
-async function exec(methodObj, chat, channel) {
+async function exec(methodObj, chat, channelId) {
     let command = _.get(methodObj, "name");
     let chatLength = chat.split(" ").length;
     if (chatLength >= 2) {
@@ -17,47 +20,67 @@ async function exec(methodObj, chat, channel) {
         type = 'lostark';
     }
 
-    let roomNumber = _.get(channel, "_channel.channelId").toString();
     switch (command) {
         case "roomRegister":
             let result = await Permission.find({
-                id: roomNumber,
+                id: channelId,
                 type
 
             }).lean();
 
+
             if (_.isEmpty(result)) {
                 try {
                     await Permission.insertMany({
-                        id: roomNumber,
+                        id: channelId,
                         type
                     });
-                    return {
-                        type: "sendChat",
-                        result: "추가 성공",
-                    };
+                    chatEvent.emit('send', {
+                        channelId,
+                        type: 'chat',
+                        data: "추가 성공"
+                    });
+                    // return {
+                    //     type: "sendChat",
+                    //     result: "추가 성공",
+                    // };
                 } catch (e) {
-                    return {
-                        type: "sendChat",
-                        result: "추가 실패",
-                    };
+                    chatEvent.emit('send', {
+                        channelId,
+                        type: 'chat',
+                        data: "추가 실패"
+                    });
+                    // return {
+                    //     type: "sendChat",
+                    //     result: "추가 실패",
+                    // };
                 }
 
             } else {
                 try {
                     await Permission.remove({
-                        id: roomNumber,
+                        id: channelId,
                         type
                     });
-                    return {
-                        type: "sendChat",
-                        result: "삭제 성공",
-                    };
+                    chatEvent.emit('send', {
+                        channelId,
+                        type: 'chat',
+                        data: "삭제 성공"
+                    });
+                    // return {
+                    //     type: "sendChat",
+                    //     result: "삭제 성공",
+                    // };
                 } catch (e) {
-                    return {
-                        type: "sendChat",
-                        result: "삭제 실패",
-                    };
+                    chatEvent.emit('send', {
+                        channelId,
+                        type: 'chat',
+                        data: "삭제 실패"
+                    });
+                    // return {
+                    //     type: "sendChat",
+                    //     result: "삭제 실패",
+                    // };
                 }
             }
             break;

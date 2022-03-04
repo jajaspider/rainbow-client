@@ -2,8 +2,11 @@ const _ = require("lodash");
 const axios = require("axios");
 const Common = require("../models/index").Common;
 const async = require("async");
+const {
+  chatEvent
+} = require('../core/eventBridge');
 
-async function exec(methodObj, chat, author) {
+async function exec(methodObj, chat, nickname, channelId) {
   let command = _.get(methodObj, "name");
   switch (command) {
     case "selection":
@@ -19,10 +22,15 @@ async function exec(methodObj, chat, author) {
 
         let data = _.get(result, "data");
         // console.dir(data);
-        return {
-          type: "sendChat",
-          result: data.payload.message,
-        };
+        chatEvent.emit('send', {
+          channelId,
+          type: 'chat',
+          data: data.payload.message
+        });
+        // return {
+        //   type: "sendChat",
+        //   result: data.payload.message,
+        // };
       } else if (chatLength >= 1) {
         let type = _.get(methodObj, "params.type");
         if (type == "channel") {
@@ -31,7 +39,7 @@ async function exec(methodObj, chat, author) {
         let params = {
           name: chat,
           type,
-          author,
+          author: nickname,
         };
 
         let result = await axios.post(
@@ -39,10 +47,15 @@ async function exec(methodObj, chat, author) {
           params
         );
         let data = _.get(result, "data");
-        return {
-          type: "sendChat",
-          result: data.payload.message,
-        };
+        chatEvent.emit('send', {
+          channelId,
+          type: 'chat',
+          data: data.payload.message
+        });
+        // return {
+        //   type: "sendChat",
+        //   result: data.payload.message,
+        // };
       }
       break;
     case "help":
@@ -60,10 +73,15 @@ async function exec(methodObj, chat, author) {
         console.dir(e);
       }
 
-      return {
-        type: "sendChat",
-          result,
-      };
+      chatEvent.emit('send', {
+        channelId,
+        type: 'chat',
+        data: result
+      });
+      // return {
+      //   type: "sendChat",
+      //     result,
+      // };
   }
 }
 

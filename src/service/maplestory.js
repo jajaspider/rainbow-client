@@ -60,10 +60,10 @@ async function exec(methodObj, chat, channelId) {
                 data: result
             });
             break;
-        // return {
-        //     type: "sendChat",
-        //         result,
-        // };
+            // return {
+            //     type: "sendChat",
+            //         result,
+            // };
         case 'info':
             if (chat == "") {
                 return;
@@ -184,8 +184,6 @@ async function exec(methodObj, chat, channelId) {
             break;
 
         case "growth":
-            console.dir(chat);
-            console.dir(chatLength);
             if (chatLength == 1) {
                 let type = _.get(methodObj, "params.type");
                 let response = await axios({
@@ -209,6 +207,25 @@ async function exec(methodObj, chat, channelId) {
                 //     type: "sendChat",
                 //     result: responseData.payload.percent,
                 // };
+            }
+            break;
+
+        case 'muto':
+            if (chatLength == 1) {
+                let templateId = 72506;
+                let templateArgs = {
+                    imageUrl: `http://sonaapi.com:30003/muto/${encodeURIComponent(chat)}.jpeg`,
+                    imageW: 1146,
+                    imageH: 480
+                }
+                chatEvent.emit('send', {
+                    channelId,
+                    type: 'kakaolink',
+                    data: {
+                        templateId,
+                        templateArgs
+                    },
+                });
             }
             break;
 

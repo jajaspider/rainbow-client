@@ -2,8 +2,12 @@ const _ = require("lodash");
 const axios = require("axios");
 const Lostark = require("../models/index").Lostark;
 const async = require("async");
+const {
+    chatEvent
+} = require('../core/eventBridge');
+const COMPRES = "\u200b".repeat(500);
 
-async function exec(methodObj, chat, author) {
+async function exec(methodObj, chat, nickname, channelId) {
     let command = _.get(methodObj, "name");
     let chatLength = chat.split(" ").length;
     let response = null;
@@ -14,7 +18,7 @@ async function exec(methodObj, chat, author) {
         case "help":
             let maplestoryMethods = await Lostark.find({}).lean();
 
-            let result = "[로스트아크 명령어]\n";
+            let result = `[로스트아크 명령어]${COMPRES}`;
             try {
                 await async.mapLimit(maplestoryMethods, 5, async (methods) => {
                     let method = _.get(methods, "method");
@@ -26,32 +30,44 @@ async function exec(methodObj, chat, author) {
                 console.dir(e);
             }
 
-            return {
-                type: "sendChat",
-                    result,
-            };
+            chatEvent.emit('send', {
+                channelId,
+                type: 'chat',
+                data: result
+            });
+            break;
+        // return {
+        //     type: "sendChat",
+        //         result,
+        // };
         case 'info':
             if (chat == '') {
-                url = `http://localhost:30003/v0/lostark/info/${encodeURIComponent(author)}`;
+                url = `http://localhost:30003/v0/lostark/info/${encodeURIComponent(nickname)}`;
             } else if (chatLength == 1) {
                 url = `http://localhost:30003/v0/lostark/info/${encodeURIComponent(chat)}`;
             }
             response = await axios.get(url);
             if (response.status != 200) {
-                return {};
+                return;
             }
             responseData = _.get(response, "data");
             errorMessage = _.get(responseData, 'payload.message');
             if (errorMessage) {
-                return {
-                    type: "sendChat",
-                    result: errorMessage,
-                }
+                chatEvent.emit('send', {
+                    channelId,
+                    type: 'chat',
+                    data: errorMessage
+                });
+                return;
+                // return {
+                //     type: "sendChat",
+                //     result: errorMessage,
+                // }
             }
 
             let character = _.get(responseData, 'payload.character');
             let server = _.get(character, 'server');
-            let nickname = _.get(character, 'nickname');
+            // let nickname = _.get(character, 'nickname');
             let job = _.get(character, 'job');
             let fightLevel = _.get(character, 'fightLevel');
             let itemLevel = _.get(character, 'itemLevel');
@@ -83,51 +99,75 @@ async function exec(methodObj, chat, author) {
                 info += `\n${card.cardSet} | ${card.cardSetValue}`;
             }
 
-            return {
-                type: "sendChat",
-                    result: info,
-            };
+            chatEvent.emit('send', {
+                channelId,
+                type: 'chat',
+                data: info
+            });
+            break;
+        // return {
+        //     type: "sendChat",
+        //         result: info,
+        // };
 
         case "crystal":
             response = await axios.get(`http://localhost:30003/v0/lostark/crystal`);
             if (response.status != 200) {
-                return {};
+                return;
             }
             responseData = _.get(response, "data");
             errorMessage = _.get(responseData, 'payload.message');
             if (errorMessage) {
-                return {
-                    type: "sendChat",
-                    result: errorMessage,
-                }
+                chatEvent.emit('send', {
+                    channelId,
+                    type: 'chat',
+                    data: errorMessage
+                });
+                return;
+
+                // return {
+                //     type: "sendChat",
+                //     result: errorMessage,
+                // }
             }
             let crystal = _.get(responseData, 'payload.result');
 
             let crystalInfo = `[크리스탈 시세]\n`
-            crystalInfo += `사실때 : ${_.get(crystal,'buyPrice')}\n`;
-            crystalInfo += `파실때 : ${_.get(crystal,'sellPrice')}\n`;
-            return {
-                type: "sendChat",
-                    result: crystalInfo,
-            };
-
+            crystalInfo += `사실때 : ${_.get(crystal, 'buyPrice')}\n`;
+            crystalInfo += `파실때 : ${_.get(crystal, 'sellPrice')}\n`;
+            chatEvent.emit('send', {
+                channelId,
+                type: 'chat',
+                data: crystalInfo
+            });
+            // return {
+            //     type: "sendChat",
+            //         result: crystalInfo,
+            // };
+            break;
         case "expand":
             if (chat == '') {
-                url = `http://localhost:30003/v0/lostark/expand/${encodeURIComponent(author)}`;
+                url = `http://localhost:30003/v0/lostark/expand/${encodeURIComponent(nickname)}`;
             } else if (chatLength == 1) {
                 url = `http://localhost:30003/v0/lostark/expand/${encodeURIComponent(chat)}`;
             }
             response = await axios.get(url);
             if (response.status != 200) {
-                return {};
+                return;
             }
             responseData = _.get(response, "data");
             errorMessage = _.get(responseData, 'payload.message');
             if (errorMessage) {
-                return {
-                    type: "sendChat",
-                    result: errorMessage,
-                }
+                chatEvent.emit('send', {
+                    channelId,
+                    type: 'chat',
+                    data: errorMessage
+                });
+                return;
+                // return {
+                //     type: "sendChat",
+                //     result: errorMessage,
+                // }
             }
             let expandList = _.get(responseData, 'payload.result');
 
@@ -137,10 +177,16 @@ async function exec(methodObj, chat, author) {
                 expandInfo += `${_.get(expand, 'server')} : ${_.get(expand, 'characterList')}\n`;
             }
 
-            return {
-                type: "sendChat",
-                    result: expandInfo,
-            };
+            chatEvent.emit('send', {
+                channelId,
+                type: 'chat',
+                data: expandInfo
+            });
+            break;
+        // return {
+        //     type: "sendChat",
+        //         result: expandInfo,
+        // };
 
 
         default:

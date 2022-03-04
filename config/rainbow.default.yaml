@@ -8,3 +8,8 @@ device:
   name : iPhone
   email : sonaapi17@gmail.com
   password : maple.support
+
+rabbitmq:
+  ip: 127.0.0.1
+  port: 5672
+  exchange: rainbow

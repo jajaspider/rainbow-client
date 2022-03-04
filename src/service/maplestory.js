@@ -2,9 +2,13 @@ const _ = require("lodash");
 const axios = require("axios");
 const Maplestory = require("../models/index").Maplestory;
 const async = require("async");
+const {
+    chatEvent
+} = require('../core/eventBridge');
+const COMPRES = "\u200b".repeat(500);
 
-async function exec(methodObj, chat, channel) {
-    let roomName = channel.info.openLink.linkName;
+async function exec(methodObj, chat, channelId) {
+    // let roomName = channel.info.openLink.linkName;
     let command = _.get(methodObj, "name");
     let chatLength = chat.split(" ").length;
     let url = null;
@@ -21,19 +25,24 @@ async function exec(methodObj, chat, channel) {
 
                 let data = _.get(result, "data");
                 // console.dir(data);
-                return {
-                    type: "sendChat",
-                    result: data.payload.message,
-                };
+                chatEvent.emit('send', {
+                    channelId,
+                    type: 'chat',
+                    data: data.payload.message
+                });
+                return;
+                // return {
+                //     type: "sendChat",
+                //     result: data.payload.message,
+                // };
             } else if (chatLength >= 1) {
                 return;
             }
             break;
         case "help":
-
             let maplestoryMethods = await Maplestory.find({}).lean();
 
-            let result = "[메이플스토리 명령어]\n";
+            let result = `[메이플스토리 명령어]${COMPRES}`;
             try {
                 await async.mapLimit(maplestoryMethods, 5, async (methods) => {
                     let method = _.get(methods, "method");
@@ -45,29 +54,40 @@ async function exec(methodObj, chat, channel) {
                 console.dir(e);
             }
 
-            return {
-                type: "sendChat",
-                result,
-            };
+            chatEvent.emit('send', {
+                channelId,
+                type: 'chat',
+                data: result
+            });
+            break;
+        // return {
+        //     type: "sendChat",
+        //         result,
+        // };
         case 'info':
             if (chat == "") {
                 return;
-            }
-            else if (chatLength > 1) {
+            } else if (chatLength > 1) {
                 return;
             }
             url = `http://localhost:30003/v0/maplestory/info/${encodeURIComponent(chat)}`;
             response = await axios.get(url);
             if (response.status != 200) {
-                return {};
+                return;
             }
             responseData = _.get(response, "data");
             errorMessage = _.get(responseData, 'payload.message');
             if (errorMessage) {
-                return {
-                    type: "sendChat",
-                    result: errorMessage,
-                }
+                chatEvent.emit('send', {
+                    channelId,
+                    type: 'chat',
+                    data: errorMessage
+                });
+                return;
+                // return {
+                //     type: "sendChat",
+                //     result: errorMessage,
+                // }
             }
 
             //정보 명령어용 템플릿
@@ -91,45 +111,77 @@ async function exec(methodObj, chat, channel) {
                 seed_time: _.get(character, 'seed.time', '-'),
             };
 
-            return {
-                type: "kakaolink",
-                result: {
-                    roomName,
+            chatEvent.emit('send', {
+                channelId,
+                type: 'kakaolink',
+                data: {
                     templateId,
                     templateArgs
                 },
-            };
-
+            });
+            // return {
+            //     type: "kakaolink",
+            //         result: {
+            //             roomName,
+            //             templateId,
+            //             templateArgs
+            //         },
+            // };
+            //카카오링크 추가
+            break;
         case 'starforce':
             if (chatLength != 2) {
-                return {
-                    type: "sendChat",
-                    result: '잘못입력하셨습니다.',
-                }
+                chatEvent.emit('send', {
+                    channelId,
+                    type: 'chat',
+                    data: "잘못입력하셨습니다."
+                });
+                return;
+                // return {
+                //     type: "sendChat",
+                //     result: '잘못입력하셨습니다.',
+                // }
             }
             let params = chat.split(" ");
             url = `http://localhost:30003/v0/maplestory/starforce/${params[0]}/${params[1]}`;
             response = await axios.get(url);
             if (response.status != 200) {
-                return {
-                    type: "sendChat",
-                    result: 'api 데이터 수신 실패',
-                };
+                chatEvent.emit('send', {
+                    channelId,
+                    type: 'chat',
+                    data: 'api 데이터 수신 실패'
+                });
+                return;
+                // return {
+                //     type: "sendChat",
+                //     result: 'api 데이터 수신 실패',
+                // };
             }
             responseData = _.get(response, "data");
             errorMessage = _.get(responseData, 'payload.message');
             if (errorMessage) {
-                return {
-                    type: "sendChat",
-                    result: errorMessage,
-                }
+                chatEvent.emit('send', {
+                    channelId,
+                    type: 'chat',
+                    data: errorMessage
+                });
+                // return {
+                //     type: "sendChat",
+                //     result: errorMessage,
+                // }
             }
 
             let starforce = _.get(responseData, 'payload.starforce');
-            return {
-                type: "sendChat",
-                result: `방어구 ${params[1]}성 강화시\n스탯 : ${starforce.stat}\n공격력 : ${starforce.attack}`
-            }
+            chatEvent.emit('send', {
+                channelId,
+                type: 'chat',
+                data: `방어구 ${params[1]}성 강화시\n스탯 : ${starforce.stat}\n공격력 : ${starforce.attack}`
+            });
+            // return {
+            //     type: "sendChat",
+            //         result: `방어구 ${params[1]}성 강화시\n스탯 : ${starforce.stat}\n공격력 : ${starforce.attack}`
+            // }
+            break;
 
         case "growth":
             console.dir(chat);
@@ -144,14 +196,19 @@ async function exec(methodObj, chat, channel) {
                     }
                 })
                 if (response.status != 200) {
-                    return {};
+                    return;
                 }
 
                 responseData = _.get(response, "data");
-                return {
-                    type: "sendChat",
-                    result: responseData.payload.percent,
-                };
+                chatEvent.emit('send', {
+                    channelId,
+                    type: 'chat',
+                    data: responseData.payload.percent
+                });
+                // return {
+                //     type: "sendChat",
+                //     result: responseData.payload.percent,
+                // };
             }
             break;
 

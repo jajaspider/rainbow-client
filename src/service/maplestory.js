@@ -5,6 +5,7 @@ const async = require("async");
 const {
     chatEvent
 } = require('../core/eventBridge');
+const COMPRES = "\u200b".repeat(500);
 
 async function exec(methodObj, chat, channelId) {
     // let roomName = channel.info.openLink.linkName;
@@ -39,10 +40,9 @@ async function exec(methodObj, chat, channelId) {
             }
             break;
         case "help":
-
             let maplestoryMethods = await Maplestory.find({}).lean();
 
-            let result = "[메이플스토리 명령어]\n";
+            let result = `[메이플스토리 명령어]${COMPRES}`;
             try {
                 await async.mapLimit(maplestoryMethods, 5, async (methods) => {
                     let method = _.get(methods, "method");
@@ -60,10 +60,10 @@ async function exec(methodObj, chat, channelId) {
                 data: result
             });
             break;
-            // return {
-            //     type: "sendChat",
-            //         result,
-            // };
+        // return {
+        //     type: "sendChat",
+        //         result,
+        // };
         case 'info':
             if (chat == "") {
                 return;

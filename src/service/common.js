@@ -5,6 +5,7 @@ const async = require("async");
 const {
   chatEvent
 } = require('../core/eventBridge');
+const COMPRES = "\u200b".repeat(500);
 
 async function exec(methodObj, chat, nickname, channelId) {
   let command = _.get(methodObj, "name");
@@ -61,7 +62,7 @@ async function exec(methodObj, chat, nickname, channelId) {
     case "help":
       let commonMethods = await Common.find({}).lean();
 
-      let result = "[기본 명령어]\n";
+      let result = `[기본 명령어]${COMPRES}`;
       try {
         await async.mapLimit(commonMethods, 5, async (methods) => {
           let method = _.get(methods, "method");
@@ -78,10 +79,10 @@ async function exec(methodObj, chat, nickname, channelId) {
         type: 'chat',
         data: result
       });
-      // return {
-      //   type: "sendChat",
-      //     result,
-      // };
+    // return {
+    //   type: "sendChat",
+    //     result,
+    // };
   }
 }
 

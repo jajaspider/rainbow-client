@@ -5,6 +5,7 @@ const async = require("async");
 const {
     chatEvent
 } = require('../core/eventBridge');
+const COMPRES = "\u200b".repeat(500);
 
 async function exec(methodObj, chat, nickname, channelId) {
     let command = _.get(methodObj, "name");
@@ -17,7 +18,7 @@ async function exec(methodObj, chat, nickname, channelId) {
         case "help":
             let maplestoryMethods = await Lostark.find({}).lean();
 
-            let result = "[로스트아크 명령어]\n";
+            let result = `[로스트아크 명령어]${COMPRES}`;
             try {
                 await async.mapLimit(maplestoryMethods, 5, async (methods) => {
                     let method = _.get(methods, "method");
@@ -35,10 +36,10 @@ async function exec(methodObj, chat, nickname, channelId) {
                 data: result
             });
             break;
-            // return {
-            //     type: "sendChat",
-            //         result,
-            // };
+        // return {
+        //     type: "sendChat",
+        //         result,
+        // };
         case 'info':
             if (chat == '') {
                 url = `http://localhost:30003/v0/lostark/info/${encodeURIComponent(nickname)}`;
@@ -104,10 +105,10 @@ async function exec(methodObj, chat, nickname, channelId) {
                 data: info
             });
             break;
-            // return {
-            //     type: "sendChat",
-            //         result: info,
-            // };
+        // return {
+        //     type: "sendChat",
+        //         result: info,
+        // };
 
         case "crystal":
             response = await axios.get(`http://localhost:30003/v0/lostark/crystal`);
@@ -132,8 +133,8 @@ async function exec(methodObj, chat, nickname, channelId) {
             let crystal = _.get(responseData, 'payload.result');
 
             let crystalInfo = `[크리스탈 시세]\n`
-            crystalInfo += `사실때 : ${_.get(crystal,'buyPrice')}\n`;
-            crystalInfo += `파실때 : ${_.get(crystal,'sellPrice')}\n`;
+            crystalInfo += `사실때 : ${_.get(crystal, 'buyPrice')}\n`;
+            crystalInfo += `파실때 : ${_.get(crystal, 'sellPrice')}\n`;
             chatEvent.emit('send', {
                 channelId,
                 type: 'chat',
@@ -182,10 +183,10 @@ async function exec(methodObj, chat, nickname, channelId) {
                 data: expandInfo
             });
             break;
-            // return {
-            //     type: "sendChat",
-            //         result: expandInfo,
-            // };
+        // return {
+        //     type: "sendChat",
+        //         result: expandInfo,
+        // };
 
 
         default:

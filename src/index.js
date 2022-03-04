@@ -81,7 +81,7 @@ chatEvent.on('send', async (payload) => {
     //     }, 1000);
     //     return;
     // }
-    console.dir(payload);
+    // console.dir(payload);
     try {
 
 

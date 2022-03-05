@@ -22,7 +22,8 @@ const {
 const KakaoLink = require('kakao-link');
 // const rabbitmq = require('./core/rabbitmq');
 const {
-    chatEvent
+    chatEvent,
+    imageEvent
 } = require('./core/eventBridge');
 // const mqService = require('./service/mqService');
 const download = require("image-downloader");
@@ -84,8 +85,8 @@ chatEvent.on('saveImage', async (payload) => {
         }
         //이미지 확장자
         let ext = String(
-                channel["_chatListStore"]["_chatList"][i].attachment.url
-            )
+            channel["_chatListStore"]["_chatList"][i].attachment.url
+        )
             .split("/")
             .reverse()[0]
             .split(".")
@@ -118,7 +119,8 @@ chatEvent.on('saveImage', async (payload) => {
                 'Content-Type': 'multipart/form-data; boundary=' + formData.getBoundary()
             },
         }
-        let response = await axios.post('http://localhost:30003/v0/images/upload', formData, requestConfig);
+
+        let response = await axios.post('http://sonaapi.com:30003/v0/images/upload', formData, requestConfig);
         responseData = _.get(response, "data");
         if (responseData.isSuccess) {
             chatEvent.emit('send', {
@@ -134,7 +136,7 @@ chatEvent.on('saveImage', async (payload) => {
             });
         }
     }
-})
+});
 
 chatEvent.on('send', async (payload) => {
     /*
@@ -144,13 +146,6 @@ chatEvent.on('send', async (payload) => {
             data: "추가 성공"
         }); 
     */
-    // if (CLIENT == null) {
-    //     setTimeout(() => {
-    //         chatEvent.emit('send', payload);
-    //     }, 1000);
-    //     return;
-    // }
-    // console.dir(payload);
     try {
         let channelId = _.get(payload, 'channelId');
 
@@ -177,12 +172,10 @@ chatEvent.on('send', async (payload) => {
             let templateArgs = _.get(payload, 'templateArgs');
             await kakaoLink.send(
                 `${channel.info.openLink.linkName}`, {
-                    link_ver: '4.0',
-                    template_id: templateId,
-                    template_args: templateArgs
-                },
-                'custom'
-            );
+                link_ver: '4.0',
+                template_id: templateId,
+                template_args: templateArgs
+            }, 'custom');
         }
 
     } catch (e) {
@@ -190,7 +183,7 @@ chatEvent.on('send', async (payload) => {
             chatEvent.emit('send', payload);
         }, 1000);
     }
-})
+});
 
 CLIENT.on('chat', async (data, channel) => {
     const sender = data.getSenderInfo(channel);
@@ -220,8 +213,13 @@ CLIENT.on('chat', async (data, channel) => {
         chat,
         attachmentId
     };
+    let imageObj = {
+        channelId,
+        chat
+    }
 
     chatEvent.emit('receive', user);
+    imageEvent.emit('receive', imageObj);
 
     // if (data.text === '안녕하세요') {
     //     // 답장 형식
@@ -235,67 +233,6 @@ CLIENT.on('chat', async (data, channel) => {
     //     // 일반 텍스트
     //     // channel.sendChat('안녕하세요');
     // }
-
-    // let dataSplit = chat.split(" ");
-    // if (dataSplit[0] === "!이모티콘등록") {
-    //     // data.chat['attachment']['src_message'] == 사진
-
-    //     for (let i = 0; i < channel["_chatListStore"]["_chatList"].length; i += 1) {
-    //         // console.log(`${i} ${channel['_chatListStore']['_chatList'][i].attachment.url}`);
-    //         // 같은 값이면
-    //         // console.dir(String(channel["_chatListStore"]["_chatList"][i].logId));
-    //         // console.dir(String(data.chat["attachment"]["src_logId"]));
-    //         // console.log(
-    //         //     `${channel["_chatListStore"]["_chatList"][i].attachment.url}`
-    //         // );
-    //         if (String(channel["_chatListStore"]["_chatList"][i].logId) != String(data.chat["attachment"]["src_logId"])) {
-    //             continue;
-    //         }
-    //         //이미지 확장자
-    //         let ext = String(
-    //                 channel["_chatListStore"]["_chatList"][i].attachment.url
-    //             )
-    //             .split("/")
-    //             .reverse()[0]
-    //             .split(".")
-    //             .reverse()[0];
-    //         let fileName = `${dataSplit[2]}.${ext}`;
-
-    //         const options = {
-    //             url: String(channel["_chatListStore"]["_chatList"][i].attachment.url),
-    //             dest: path.join(process.cwd(), 'tempImage', fileName),
-    //         };
-
-    //         await download.image(options)
-    //             .then(({
-    //                 filename
-    //             }) => {
-    //                 // console.log("Saved to", filename); // saved to /path/to/dest/photo.jpg
-    //                 // console.dir(filename);
-    //                 fileName = filename;
-    //             })
-    //             .catch((err) => {
-    //                 //ignore
-    //                 console.dir(err);
-    //             });
-
-    //         const formData = new FormData();
-    //         formData.append("file", fs.createReadStream(fileName));
-    //         formData.append("type", dataSplit[1]);
-    //         formData.append("name", dataSplit[2]);
-
-    //         const requestConfig = {
-    //             headers: {
-    //                 'Content-Type': 'multipart/form-data; boundary=' + formData.getBoundary()
-    //             },
-    //         }
-    //         let result = await axios.post('http://localhost:30003/v0/images/upload', formData, requestConfig);
-    //         console.dir(result);
-    //     }
-    // }
-    // console.log(channel['_chatListStore']['_chatList']);
-    // console.log(data.chat['attachment']['src_message']);
-
 });
 
 async function main() {

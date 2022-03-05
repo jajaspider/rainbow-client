@@ -4,31 +4,22 @@ const permissionRouter = require("./permission");
 const manageRouter = require("./manage");
 const maplestoryRouter = require("./maplestory");
 const lostarkRouter = require("./lostark");
-// const rabbitmq = require('../core/rabbitmq');
-// const Room = require("../models/index").Room;
 const {
-  chatEvent
+  chatEvent,
+  imageEvent
 } = require('../core/eventBridge');
-
-// async function consumeRouter(msg) {
-//   msg.ack;
-//   console.dir(msg);
-// }
+const imageService = require('../service/imageService');
 
 chatEvent.on('receive', async (user) => {
-  // let runMethod = [];
   try {
     // console.dir(user);
 
     let commandPrefix = "!";
     let chat = _.get(user, 'chat');
     const channelId = _.get(user, 'channelId');
-    let nickname = _.get(user, 'nickname');
-    let attachmentId = _.get(user, 'attachmentId');
-    nickname = nickname.split('/')[0].trim();
-    // let sender = data.getSenderInfo(channel);
-    // let author = _.get(sender, "nickname");
-    // author = String(author).split("/")[0].trim();
+    const nickname = (_.get(user, 'nickname')).split('/')[0].trim();
+    // nickname = nickname.split('/')[0].trim();
+    const attachmentId = _.get(user, 'attachmentId');
 
     // 오픈 카톡방이 아니므로 생략처리
     // if (_.get(sender, 'userType') != 1000) {
@@ -44,15 +35,13 @@ chatEvent.on('receive', async (user) => {
 
     let command = chat.replace(commandPrefix, "").split(" ")[0];
     chat = chat.replace(`${commandPrefix}${command}`, "").trim();
-    // runMethod.push(await commonRouter.router(command, chat, author));
     await commonRouter.router(command, chat, nickname, channelId);
-    // // 반환되는형태는 sendChat, reply 형태
+    // 반환되는형태는 sendChat, reply 형태
     let userId = _.get(user, 'userId');
     if (userId) {
       let isManager = await permissionRouter.router(userId);
       // 매니저 권한인것으로 확인
       if (_.includes(isManager, 'manager')) {
-        // runMethod.push(await manageRouter.router(command, chat, channel));
         await manageRouter.router(command, chat, channelId, attachmentId);
       }
     }
@@ -66,10 +55,43 @@ chatEvent.on('receive', async (user) => {
     if (_.includes(roomTypes, 'lostark')) {
       await lostarkRouter.router(command, chat, nickname, channelId);
     }
-
-    // return runMethod;
-    // console.dir(roomType);
   } catch (e) {
     console.dir(e);
   }
-})
+});
+
+imageEvent.on('receive', async (imageObj) => {
+  let channelId = _.get(imageObj, 'channelId');
+  let chat = _.get(imageObj, 'chat');
+
+  let roomTypes = await permissionRouter.router(channelId);
+  if (_.includes(roomTypes, 'maplestory')) {
+    //
+    // _.get(imageService.imageCache['maplestory'], {
+    //   name: chat
+    // });
+
+  }
+  if (_.includes(roomTypes, 'lostark')) {
+    let searchImage = _.find(imageService.imageCache['lostark'], {
+      name: chat
+    });
+    if (!searchImage) {
+      console.dir(searchImage);
+      let templateId = 72506;
+      let templateArgs = {
+        imageUrl: `http://sonaapi.com:30003/${searchImage.imageUrl.split("/")[0]}/${encodeURIComponent(searchImage.imageUrl.split("/")[1])}`,
+        imageW: searchImage.imageW,
+        imageH: searchImage.imageH
+      }
+      chatEvent.emit('send', {
+        channelId,
+        type: 'kakaolink',
+        data: {
+          templateId,
+          templateArgs
+        },
+      });
+    }
+  }
+});

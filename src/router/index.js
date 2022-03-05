@@ -66,24 +66,40 @@ imageEvent.on('receive', async (imageObj) => {
 
   let roomTypes = await permissionRouter.router(channelId);
   if (_.includes(roomTypes, 'maplestory')) {
-    //
-    // _.get(imageService.imageCache['maplestory'], {
-    //   name: chat
-    // });
-
-  }
-  if (_.includes(roomTypes, 'lostark')) {
-    let searchImage = _.find(imageService.imageCache['lostark'], {
+    let searchImage = _.find(imageService.imageCache['maplestory'], {
       name: chat
     });
-    if (!searchImage) {
-      console.dir(searchImage);
+    if (searchImage) {
       let templateId = 72506;
       let templateArgs = {
         imageUrl: `http://sonaapi.com:30003/${searchImage.imageUrl.split("/")[0]}/${encodeURIComponent(searchImage.imageUrl.split("/")[1])}`,
         imageW: searchImage.imageW,
         imageH: searchImage.imageH
       }
+
+      chatEvent.emit('send', {
+        channelId,
+        type: 'kakaolink',
+        data: {
+          templateId,
+          templateArgs
+        },
+      });
+    }
+  }
+
+  if (_.includes(roomTypes, 'lostark')) {
+    let searchImage = _.find(imageService.imageCache['lostark'], {
+      name: chat
+    });
+    if (searchImage) {
+      let templateId = 72506;
+      let templateArgs = {
+        imageUrl: `http://sonaapi.com:30003/${searchImage.imageUrl.split("/")[0]}/${encodeURIComponent(searchImage.imageUrl.split("/")[1])}`,
+        imageW: searchImage.imageW,
+        imageH: searchImage.imageH
+      }
+
       chatEvent.emit('send', {
         channelId,
         type: 'kakaolink',
@@ -95,3 +111,7 @@ imageEvent.on('receive', async (imageObj) => {
     }
   }
 });
+
+imageEvent.on('save', (image) => {
+  imageService.addImage(image.type, image);
+})

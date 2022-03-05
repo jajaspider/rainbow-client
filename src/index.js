@@ -122,7 +122,10 @@ chatEvent.on('saveImage', async (payload) => {
 
         let response = await axios.post('http://sonaapi.com:30003/v0/images/upload', formData, requestConfig);
         responseData = _.get(response, "data");
+        let image = _.get(responseData, 'payload.image');
         if (responseData.isSuccess) {
+            imageEvent.emit('save', image);
+
             chatEvent.emit('send', {
                 channelId,
                 type: 'chat',

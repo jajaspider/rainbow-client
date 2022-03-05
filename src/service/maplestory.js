@@ -263,7 +263,7 @@ async function exec(methodObj, chat, channelId) {
             break;
         case "emoticon":
             let images = imageService.getImage('maplestory');
-            let emoticonList = `[메이플스토리 이모티콘]${COMPRES}`;
+            let emoticonList = `[메이플스토리 이모티콘]\n${COMPRES}`;
             for (let image of images) {
                 emoticonList += `\n${image.name}`;
             }

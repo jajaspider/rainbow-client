@@ -190,7 +190,7 @@ async function exec(methodObj, chat, nickname, channelId) {
         // };
         case "emoticon":
             let images = imageService.getImage('lostark');
-            let emoticonList = `[로스트아크 이모티콘]${COMPRES}`;
+            let emoticonList = `[로스트아크 이모티콘]\n${COMPRES}`;
             for (let image of images) {
                 emoticonList += `\n${image.name}`;
             }

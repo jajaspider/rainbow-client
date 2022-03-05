@@ -6,6 +6,7 @@ const {
     chatEvent
 } = require('../core/eventBridge');
 const COMPRES = "\u200b".repeat(500);
+const imageService = require('./imageService');
 
 async function exec(methodObj, chat, nickname, channelId) {
     let command = _.get(methodObj, "name");
@@ -187,6 +188,19 @@ async function exec(methodObj, chat, nickname, channelId) {
         //     type: "sendChat",
         //         result: expandInfo,
         // };
+        case "emoticon":
+            let images = imageService.getImage('lostark');
+            let emoticonList = `[로스트아크 이모티콘]${COMPRES}`;
+            for (let image of images) {
+                emoticonList += `${image.name}\n`;
+            }
+
+            chatEvent.emit('send', {
+                channelId,
+                type: 'chat',
+                data: emoticonList
+            });
+            break;
 
 
         default:

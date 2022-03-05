@@ -6,6 +6,7 @@ const {
     chatEvent
 } = require('../core/eventBridge');
 const COMPRES = "\u200b".repeat(500);
+const imageService = require('./imageService');
 
 async function exec(methodObj, chat, channelId) {
     // let roomName = channel.info.openLink.linkName;
@@ -62,10 +63,10 @@ async function exec(methodObj, chat, channelId) {
                 data: result
             });
             break;
-            // return {
-            //     type: "sendChat",
-            //         result,
-            // };
+        // return {
+        //     type: "sendChat",
+        //         result,
+        // };
         case 'info':
             if (chat == "") {
                 return;
@@ -258,6 +259,19 @@ async function exec(methodObj, chat, channelId) {
                     templateId,
                     templateArgs
                 },
+            });
+            break;
+        case "emoticon":
+            let images = imageService.getImage('maplestory');
+            let emoticonList = `[메이플스토리 이모티콘]${COMPRES}`;
+            for (let image of images) {
+                emoticonList += `${image.name}\n`;
+            }
+
+            chatEvent.emit('send', {
+                channelId,
+                type: 'chat',
+                data: emoticonList
             });
             break;
 

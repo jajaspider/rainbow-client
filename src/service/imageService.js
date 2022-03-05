@@ -21,6 +21,10 @@ class ImageService {
     addImage(type, image) {
         this.imageCache[type].push(image);
     }
+
+    getImage(type) {
+        return this.imageCache[type];
+    }
 }
 
 const imageService = new ImageService();

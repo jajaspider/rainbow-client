@@ -4,10 +4,10 @@ mongo:
   database : kakaobot
 
 device:
-  uuid : 0a/jpfWtteQEqJuVWp1gdIkb/yhnANuYmxkXCFpcSB2Uu0XU5wuTkJ3gBRxFRRpyKI2406Xbyp+GVP7LcKOG4Q==
-  name : iPhone
-  email : sonaapi17@gmail.com
-  password : maple.support
+  uuid : your-uuid
+  name : your-name
+  email : your-email
+  password : your-password
 
 rabbitmq:
   ip: 127.0.0.1

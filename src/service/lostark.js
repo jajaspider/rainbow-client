@@ -192,7 +192,7 @@ async function exec(methodObj, chat, nickname, channelId) {
             let images = imageService.getImage('lostark');
             let emoticonList = `[로스트아크 이모티콘]${COMPRES}`;
             for (let image of images) {
-                emoticonList += `${image.name}\n`;
+                emoticonList += `\n${image.name}`;
             }
 
             chatEvent.emit('send', {

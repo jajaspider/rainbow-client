@@ -265,7 +265,7 @@ async function exec(methodObj, chat, channelId) {
             let images = imageService.getImage('maplestory');
             let emoticonList = `[메이플스토리 이모티콘]${COMPRES}`;
             for (let image of images) {
-                emoticonList += `${image.name}\n`;
+                emoticonList += `\n${image.name}`;
             }
 
             chatEvent.emit('send', {

@@ -12,6 +12,8 @@ async function exec(methodObj, chat, channelId) {
     let command = _.get(methodObj, "name");
     let chatLength = chat.split(" ").length;
     let url = null;
+    let templateId = null;
+    let templateArgs = null;
     switch (command) {
         case "selection":
             if (chat == "") {
@@ -91,10 +93,10 @@ async function exec(methodObj, chat, channelId) {
             }
 
             //정보 명령어용 템플릿
-            let templateId = 54726;
+            templateId = 54726;
             let character = _.get(responseData, 'payload.character');
 
-            let templateArgs = {
+            templateArgs = {
                 character_name: _.get(character, 'name'),
                 character_level: _.get(character, 'level'),
                 character_class: _.get(character, 'class'),
@@ -211,22 +213,52 @@ async function exec(methodObj, chat, channelId) {
             break;
 
         case 'muto':
-            if (chatLength == 1) {
-                let templateId = 72506;
-                let templateArgs = {
-                    imageUrl: `http://sonaapi.com:30003/muto/${encodeURIComponent(chat)}.jpeg`,
-                    imageW: 1146,
-                    imageH: 480
-                }
+            if (chatLength != 1) {
                 chatEvent.emit('send', {
                     channelId,
-                    type: 'kakaolink',
-                    data: {
-                        templateId,
-                        templateArgs
-                    },
+                    type: 'chat',
+                    data: '잘못입력하셨습니다.'
+                });
+                return;
+            }
+
+            url = `http://localhost:30003/v0/images/muto/${encodeURIComponent(chat)}`;
+            response = await axios.get(url);
+            if (response.status != 200) {
+                chatEvent.emit('send', {
+                    channelId,
+                    type: 'chat',
+                    data: 'api 데이터 수신 실패'
+                });
+                return;
+            }
+            responseData = _.get(response, "data");
+            errorMessage = _.get(responseData, 'payload.message');
+            if (errorMessage) {
+                chatEvent.emit('send', {
+                    channelId,
+                    type: 'chat',
+                    data: errorMessage
                 });
             }
+
+            let image = _.get(responseData, 'payload.image');
+            // console.dir(`${image.imageUrl.split("/")[0]}/${encodeURIComponent(image.imageUrl.split("/")[1])}`);
+
+            templateId = 72506;
+            templateArgs = {
+                imageUrl: `http://sonaapi.com:30003/${image.imageUrl.split("/")[0]}/${encodeURIComponent(image.imageUrl.split("/")[1])}`,
+                imageW: image.imageW,
+                imageH: image.imageH
+            }
+            chatEvent.emit('send', {
+                channelId,
+                type: 'kakaolink',
+                data: {
+                    templateId,
+                    templateArgs
+                },
+            });
             break;
 
         default:

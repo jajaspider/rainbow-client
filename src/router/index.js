@@ -24,6 +24,7 @@ chatEvent.on('receive', async (user) => {
     let chat = _.get(user, 'chat');
     const channelId = _.get(user, 'channelId');
     let nickname = _.get(user, 'nickname');
+    let attachmentId = _.get(user, 'attachmentId');
     nickname = nickname.split('/')[0].trim();
     // let sender = data.getSenderInfo(channel);
     // let author = _.get(sender, "nickname");
@@ -52,7 +53,7 @@ chatEvent.on('receive', async (user) => {
       // 매니저 권한인것으로 확인
       if (_.includes(isManager, 'manager')) {
         // runMethod.push(await manageRouter.router(command, chat, channel));
-        await manageRouter.router(command, chat, channelId);
+        await manageRouter.router(command, chat, channelId, attachmentId);
       }
     }
 

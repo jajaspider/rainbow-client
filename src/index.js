@@ -20,12 +20,11 @@ const {
     sleep
 } = require("./utils");
 const KakaoLink = require('kakao-link');
-// const rabbitmq = require('./core/rabbitmq');
+const rabbitmq = require('./core/rabbitmq');
 const {
     chatEvent,
     imageEvent
 } = require('./core/eventBridge');
-// const mqService = require('./service/mqService');
 const download = require("image-downloader");
 const axios = require('axios');
 const FormData = require('form-data');

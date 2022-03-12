@@ -7,7 +7,7 @@ const {
 } = require('../core/eventBridge');
 const COMPRES = "\u200b".repeat(500);
 
-async function exec(methodObj, chat, nickname, channelId) {
+async function exec(methodObj, chat, nickname, channelId, client) {
   let command = _.get(methodObj, "name");
   switch (command) {
     case "selection":
@@ -26,7 +26,8 @@ async function exec(methodObj, chat, nickname, channelId) {
         chatEvent.emit('send', {
           channelId,
           type: 'chat',
-          data: data.payload.message
+          data: data.payload.message,
+          client
         });
         // return {
         //   type: "sendChat",
@@ -51,7 +52,8 @@ async function exec(methodObj, chat, nickname, channelId) {
         chatEvent.emit('send', {
           channelId,
           type: 'chat',
-          data: data.payload.message
+          data: data.payload.message,
+          client
         });
         // return {
         //   type: "sendChat",
@@ -77,12 +79,13 @@ async function exec(methodObj, chat, nickname, channelId) {
       chatEvent.emit('send', {
         channelId,
         type: 'chat',
-        data: result
+        data: result,
+        client
       });
-    // return {
-    //   type: "sendChat",
-    //     result,
-    // };
+      // return {
+      //   type: "sendChat",
+      //     result,
+      // };
   }
 }
 

@@ -8,7 +8,7 @@ const {
 const COMPRES = "\u200b".repeat(500);
 const imageService = require('./imageService');
 
-async function exec(methodObj, chat, channelId) {
+async function exec(methodObj, chat, channelId, client) {
     // let roomName = channel.info.openLink.linkName;
     let command = _.get(methodObj, "name");
     let chatLength = chat.split(" ").length;
@@ -31,7 +31,8 @@ async function exec(methodObj, chat, channelId) {
                 chatEvent.emit('send', {
                     channelId,
                     type: 'chat',
-                    data: data.payload.message
+                    data: data.payload.message,
+                    client
                 });
                 return;
                 // return {
@@ -60,13 +61,14 @@ async function exec(methodObj, chat, channelId) {
             chatEvent.emit('send', {
                 channelId,
                 type: 'chat',
-                data: result
+                data: result,
+                client
             });
             break;
-        // return {
-        //     type: "sendChat",
-        //         result,
-        // };
+            // return {
+            //     type: "sendChat",
+            //         result,
+            // };
         case 'info':
             if (chat == "") {
                 return;
@@ -84,7 +86,8 @@ async function exec(methodObj, chat, channelId) {
                 chatEvent.emit('send', {
                     channelId,
                     type: 'chat',
-                    data: errorMessage
+                    data: errorMessage,
+                    client
                 });
                 return;
                 // return {
@@ -114,14 +117,25 @@ async function exec(methodObj, chat, channelId) {
                 seed_time: _.get(character, 'seed.time', '-'),
             };
 
-            chatEvent.emit('send', {
-                channelId,
-                type: 'kakaolink',
-                data: {
-                    templateId,
-                    templateArgs
-                },
-            });
+            if (client == 'kakao') {
+                chatEvent.emit('send', {
+                    channelId,
+                    type: 'kakaolink',
+                    data: {
+                        templateId,
+                        templateArgs
+                    },
+                    client
+                });
+            } else if (client == 'discord') {
+                chatEvent.emit('send', {
+                    channelId,
+                    type: 'embed',
+                    subType: 'maplestoryInfo',
+                    data: character,
+                    client
+                });
+            }
             // return {
             //     type: "kakaolink",
             //         result: {
@@ -137,7 +151,8 @@ async function exec(methodObj, chat, channelId) {
                 chatEvent.emit('send', {
                     channelId,
                     type: 'chat',
-                    data: "잘못입력하셨습니다."
+                    data: "잘못입력하셨습니다.",
+                    client
                 });
                 return;
                 // return {
@@ -152,7 +167,8 @@ async function exec(methodObj, chat, channelId) {
                 chatEvent.emit('send', {
                     channelId,
                     type: 'chat',
-                    data: 'api 데이터 수신 실패'
+                    data: 'api 데이터 수신 실패',
+                    client
                 });
                 return;
                 // return {
@@ -166,7 +182,8 @@ async function exec(methodObj, chat, channelId) {
                 chatEvent.emit('send', {
                     channelId,
                     type: 'chat',
-                    data: errorMessage
+                    data: errorMessage,
+                    client
                 });
                 // return {
                 //     type: "sendChat",
@@ -178,7 +195,8 @@ async function exec(methodObj, chat, channelId) {
             chatEvent.emit('send', {
                 channelId,
                 type: 'chat',
-                data: `방어구 ${params[1]}성 강화시\n스탯 : ${starforce.stat}\n공격력 : ${starforce.attack}`
+                data: `방어구 ${params[1]}성 강화시\n스탯 : ${starforce.stat}\n공격력 : ${starforce.attack}`,
+                client
             });
             // return {
             //     type: "sendChat",
@@ -204,7 +222,8 @@ async function exec(methodObj, chat, channelId) {
                 chatEvent.emit('send', {
                     channelId,
                     type: 'chat',
-                    data: responseData.payload.percent
+                    data: responseData.payload.percent,
+                    client
                 });
                 // return {
                 //     type: "sendChat",
@@ -214,11 +233,12 @@ async function exec(methodObj, chat, channelId) {
             break;
 
         case 'muto':
-            if (chatLength != 1) {
+            if (chatLength != 1 || chat == '') {
                 chatEvent.emit('send', {
                     channelId,
                     type: 'chat',
-                    data: '잘못입력하셨습니다.'
+                    data: '잘못입력하셨습니다.',
+                    client
                 });
                 return;
             }
@@ -229,7 +249,8 @@ async function exec(methodObj, chat, channelId) {
                 chatEvent.emit('send', {
                     channelId,
                     type: 'chat',
-                    data: 'api 데이터 수신 실패'
+                    data: 'api 데이터 수신 실패',
+                    client
                 });
                 return;
             }
@@ -239,7 +260,8 @@ async function exec(methodObj, chat, channelId) {
                 chatEvent.emit('send', {
                     channelId,
                     type: 'chat',
-                    data: errorMessage
+                    data: errorMessage,
+                    client
                 });
             }
 
@@ -252,14 +274,25 @@ async function exec(methodObj, chat, channelId) {
                 imageW: image.imageW,
                 imageH: image.imageH
             }
-            chatEvent.emit('send', {
-                channelId,
-                type: 'kakaolink',
-                data: {
-                    templateId,
-                    templateArgs
-                },
-            });
+            if (client == 'kakao') {
+                chatEvent.emit('send', {
+                    channelId,
+                    type: 'kakaolink',
+                    data: {
+                        templateId,
+                        templateArgs
+                    },
+                    client
+                });
+            } else if (client == 'discord') {
+                chatEvent.emit('send', {
+                    channelId,
+                    type: 'embed',
+                    subType: 'emoticon',
+                    data: image,
+                    client
+                });
+            }
             break;
         case "emoticon":
             let images = imageService.getImage('maplestory');
@@ -271,7 +304,8 @@ async function exec(methodObj, chat, channelId) {
             chatEvent.emit('send', {
                 channelId,
                 type: 'chat',
-                data: emoticonList
+                data: emoticonList,
+                client
             });
             break;
 

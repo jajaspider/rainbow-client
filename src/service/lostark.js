@@ -8,7 +8,7 @@ const {
 const COMPRES = "\u200b".repeat(500);
 const imageService = require('./imageService');
 
-async function exec(methodObj, chat, nickname, channelId) {
+async function exec(methodObj, chat, nickname, channelId, client) {
     let command = _.get(methodObj, "name");
     let chatLength = chat.split(" ").length;
     let response = null;
@@ -34,13 +34,14 @@ async function exec(methodObj, chat, nickname, channelId) {
             chatEvent.emit('send', {
                 channelId,
                 type: 'chat',
-                data: result
+                data: result,
+                client
             });
             break;
-        // return {
-        //     type: "sendChat",
-        //         result,
-        // };
+            // return {
+            //     type: "sendChat",
+            //         result,
+            // };
         case 'info':
             if (chat == '') {
                 url = `http://localhost:30003/v0/lostark/info/${encodeURIComponent(nickname)}`;
@@ -57,7 +58,8 @@ async function exec(methodObj, chat, nickname, channelId) {
                 chatEvent.emit('send', {
                     channelId,
                     type: 'chat',
-                    data: errorMessage
+                    data: errorMessage,
+                    client
                 });
                 return;
                 // return {
@@ -103,13 +105,14 @@ async function exec(methodObj, chat, nickname, channelId) {
             chatEvent.emit('send', {
                 channelId,
                 type: 'chat',
-                data: info
+                data: info,
+                client
             });
             break;
-        // return {
-        //     type: "sendChat",
-        //         result: info,
-        // };
+            // return {
+            //     type: "sendChat",
+            //         result: info,
+            // };
 
         case "crystal":
             response = await axios.get(`http://localhost:30003/v0/lostark/crystal`);
@@ -122,7 +125,8 @@ async function exec(methodObj, chat, nickname, channelId) {
                 chatEvent.emit('send', {
                     channelId,
                     type: 'chat',
-                    data: errorMessage
+                    data: errorMessage,
+                    client
                 });
                 return;
 
@@ -139,7 +143,8 @@ async function exec(methodObj, chat, nickname, channelId) {
             chatEvent.emit('send', {
                 channelId,
                 type: 'chat',
-                data: crystalInfo
+                data: crystalInfo,
+                client
             });
             // return {
             //     type: "sendChat",
@@ -162,7 +167,8 @@ async function exec(methodObj, chat, nickname, channelId) {
                 chatEvent.emit('send', {
                     channelId,
                     type: 'chat',
-                    data: errorMessage
+                    data: errorMessage,
+                    client
                 });
                 return;
                 // return {
@@ -181,13 +187,14 @@ async function exec(methodObj, chat, nickname, channelId) {
             chatEvent.emit('send', {
                 channelId,
                 type: 'chat',
-                data: expandInfo
+                data: expandInfo,
+                client
             });
             break;
-        // return {
-        //     type: "sendChat",
-        //         result: expandInfo,
-        // };
+            // return {
+            //     type: "sendChat",
+            //         result: expandInfo,
+            // };
         case "emoticon":
             let images = imageService.getImage('lostark');
             let emoticonList = `[로스트아크 이모티콘]\n${COMPRES}`;
@@ -198,7 +205,8 @@ async function exec(methodObj, chat, nickname, channelId) {
             chatEvent.emit('send', {
                 channelId,
                 type: 'chat',
-                data: emoticonList
+                data: emoticonList,
+                client
             });
             break;
 

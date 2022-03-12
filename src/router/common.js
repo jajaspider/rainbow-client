@@ -2,7 +2,7 @@ const Common = require("../models/index").Common;
 const commonService = require("../service/common");
 const _ = require("lodash");
 
-async function router(command, chat, nickname, channelId) {
+async function router(command, chat, nickname, channelId, client) {
   let result = null;
   result = await Common.find({
     method: command,
@@ -18,7 +18,7 @@ async function router(command, chat, nickname, channelId) {
     return;
   }
 
-  await commonService.exec(result[0], chat, nickname, channelId);
+  await commonService.exec(result[0], chat, nickname, channelId, client);
 }
 
 module.exports = {

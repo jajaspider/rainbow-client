@@ -12,19 +12,30 @@ const imageService = require('../service/imageService');
 
 chatEvent.on('receive', async (user) => {
   try {
-    // console.dir(user);
+    console.dir(user);
 
     let commandPrefix = "!";
     let chat = _.get(user, 'chat');
     const channelId = _.get(user, 'channelId');
-    const nickname = (_.get(user, 'nickname')).split('/')[0].trim();
+    const nickname = _.get(user, 'nickname');
     // nickname = nickname.split('/')[0].trim();
     const attachmentId = _.get(user, 'attachmentId');
+    const client = _.get(user, 'client');
 
     // 오픈 카톡방이 아니므로 생략처리
     // if (_.get(sender, 'userType') != 1000) {
     //   return;
     // }
+
+    if (chat.includes('vs')) {
+      let chatSplit = chat.split("vs");
+      chatEvent.emit('send', {
+        channelId,
+        type: 'chat',
+        data: _.sample(chatSplit).trim(),
+        client
+      });
+    }
 
     if (!_.startsWith(chat, commandPrefix)) {
       //commandPrefix로 시작하지않으므로 생략처리;
@@ -35,25 +46,25 @@ chatEvent.on('receive', async (user) => {
 
     let command = chat.replace(commandPrefix, "").split(" ")[0];
     chat = chat.replace(`${commandPrefix}${command}`, "").trim();
-    await commonRouter.router(command, chat, nickname, channelId);
+    await commonRouter.router(command, chat, nickname, channelId, client);
     // 반환되는형태는 sendChat, reply 형태
     let userId = _.get(user, 'userId');
     if (userId) {
       let isManager = await permissionRouter.router(userId);
       // 매니저 권한인것으로 확인
       if (_.includes(isManager, 'manager')) {
-        await manageRouter.router(command, chat, channelId, attachmentId);
+        await manageRouter.router(command, chat, channelId, attachmentId, client);
       }
     }
 
     let roomTypes = await permissionRouter.router(channelId);
 
     if (_.includes(roomTypes, 'maplestory')) {
-      await maplestoryRouter.router(command, chat, channelId);
+      await maplestoryRouter.router(command, chat, channelId, client);
     }
 
     if (_.includes(roomTypes, 'lostark')) {
-      await lostarkRouter.router(command, chat, nickname, channelId);
+      await lostarkRouter.router(command, chat, nickname, channelId, client);
     }
   } catch (e) {
     console.dir(e);
@@ -76,15 +87,26 @@ imageEvent.on('receive', async (imageObj) => {
         imageW: searchImage.imageW,
         imageH: searchImage.imageH
       }
+      if (client == 'kakao') {
+        chatEvent.emit('send', {
+          channelId,
+          type: 'kakaolink',
+          data: {
+            templateId,
+            templateArgs
+          },
+          client
+        });
+      } else if (client == 'discord') {
+        chatEvent.emit('send', {
+          channelId,
+          type: 'embed',
+          data: templateArgs,
+          client
+        });
+      }
 
-      chatEvent.emit('send', {
-        channelId,
-        type: 'kakaolink',
-        data: {
-          templateId,
-          templateArgs
-        },
-      });
+
     }
   }
 
@@ -100,14 +122,25 @@ imageEvent.on('receive', async (imageObj) => {
         imageH: searchImage.imageH
       }
 
-      chatEvent.emit('send', {
-        channelId,
-        type: 'kakaolink',
-        data: {
-          templateId,
-          templateArgs
-        },
-      });
+      if (client == 'kakao') {
+        chatEvent.emit('send', {
+          channelId,
+          type: 'kakaolink',
+          data: {
+            templateId,
+            templateArgs
+          },
+          client
+        });
+      } else if (client == 'discord') {
+        chatEvent.emit('send', {
+          channelId,
+          type: 'embed',
+          subType: 'emoticon',
+          data: searchImage,
+          client
+        });
+      }
     }
   }
 });

@@ -25,6 +25,9 @@ class RabbitMQ {
                         }),
                         channel.assertExchange('rainbow', 'topic'),
                         channel.prefetch(1),
+                        channel.assertQueue('notice.maplestory', {
+                            durable: true
+                        }),
                         channel.bindQueue('notice.maplestory', 'rainbow', 'notice'),
                         channel.consume('notice.maplestory', mapleNoticeMessage)
                     ],
@@ -34,6 +37,9 @@ class RabbitMQ {
                         }),
                         channel.assertExchange('rainbow', 'topic'),
                         channel.prefetch(1),
+                        channel.assertQueue('notice.lostark', {
+                            durable: true
+                        }),
                         channel.bindQueue('notice.lostark', 'rainbow', 'notice'),
                         channel.consume('notice.lostark', loaNoticeMessage)
                     ]

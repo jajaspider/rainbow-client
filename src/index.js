@@ -22,9 +22,12 @@ const {
 const KakaoLink = require('kakao-link');
 const rabbitmq = require('./core/rabbitmq');
 const {
-    chatEvent
+    chatEvent,
+    imageEvent
 } = require('./core/eventBridge');
-// const mqService = require('./service/mqService');
+const download = require("image-downloader");
+const axios = require('axios');
+const FormData = require('form-data');
 
 
 let configPath = path.join(process.cwd(), 'config', 'rainbow.develop.yaml');
@@ -67,6 +70,76 @@ async function kakaoLogin() {
     }
 }
 
+chatEvent.on('saveImage', async (payload) => {
+    let channelId = _.get(payload, 'channelId');
+    // 채널 이름 = channel.info.openLink.linkName;
+    let channel = CLIENT.channelList._open._map.get(channelId);
+    const attachmentId = _.get(payload, 'attachmentId');
+    const chat = _.get(payload, 'chat');
+
+    let chatSplit = chat.split(" ");
+    for (let i = 0; i < channel["_chatListStore"]["_chatList"].length; i += 1) {
+        if (String(channel["_chatListStore"]["_chatList"][i].logId) != attachmentId) {
+            continue;
+        }
+        //이미지 확장자
+        let ext = String(
+            channel["_chatListStore"]["_chatList"][i].attachment.url
+        )
+            .split("/")
+            .reverse()[0]
+            .split(".")
+            .reverse()[0];
+        let fileName = `${chatSplit[1]}.${ext}`;
+
+        const options = {
+            url: String(channel["_chatListStore"]["_chatList"][i].attachment.url),
+            dest: path.join(process.cwd(), 'tempImage', fileName),
+        };
+
+        await download.image(options)
+            .then(({
+                filename
+            }) => {
+                fileName = filename;
+            })
+            .catch((err) => {
+                //ignore
+                console.dir(err);
+            });
+
+        const formData = new FormData();
+        formData.append("file", fs.createReadStream(fileName));
+        formData.append("type", chatSplit[0]);
+        formData.append("name", chatSplit[1]);
+
+        const requestConfig = {
+            headers: {
+                'Content-Type': 'multipart/form-data; boundary=' + formData.getBoundary()
+            },
+        }
+
+        let response = await axios.post('http://sonaapi.com:30003/v0/images/upload', formData, requestConfig);
+        responseData = _.get(response, "data");
+        let image = _.get(responseData, 'payload.image');
+        if (responseData.isSuccess) {
+            imageEvent.emit('save', image);
+
+            chatEvent.emit('send', {
+                channelId,
+                type: 'chat',
+                data: '저장 성공'
+            });
+        } else {
+            chatEvent.emit('send', {
+                channelId,
+                type: 'chat',
+                data: '등록 실패'
+            });
+        }
+    }
+});
+
 chatEvent.on('send', async (payload) => {
     /*
         chatEvent.emit('send', {
@@ -75,16 +148,7 @@ chatEvent.on('send', async (payload) => {
             data: "추가 성공"
         }); 
     */
-    // if (CLIENT == null) {
-    //     setTimeout(() => {
-    //         chatEvent.emit('send', payload);
-    //     }, 1000);
-    //     return;
-    // }
-    // console.dir(payload);
     try {
-
-
         let channelId = _.get(payload, 'channelId');
 
         // 채널 이름 = channel.info.openLink.linkName;
@@ -110,19 +174,18 @@ chatEvent.on('send', async (payload) => {
             let templateArgs = _.get(payload, 'templateArgs');
             await kakaoLink.send(
                 `${channel.info.openLink.linkName}`, {
-                    link_ver: '4.0',
-                    template_id: templateId,
-                    template_args: templateArgs
-                },
-                'custom'
-            );
+                link_ver: '4.0',
+                template_id: templateId,
+                template_args: templateArgs
+            }, 'custom');
         }
+
     } catch (e) {
         setTimeout(() => {
             chatEvent.emit('send', payload);
         }, 1000);
     }
-})
+});
 
 CLIENT.on('chat', async (data, channel) => {
     const sender = data.getSenderInfo(channel);
@@ -138,15 +201,27 @@ CLIENT.on('chat', async (data, channel) => {
 
     let nickname = _.get(sender, "nickname");
     let chat = data.text;
+    let attachmentId = null;
+    try {
+        attachmentId = String(data.chat["attachment"]["src_logId"]);
+    } catch (e) {
+        //ignore
+    }
 
     let user = {
         channelId,
         userId,
         nickname,
-        chat
+        chat,
+        attachmentId
     };
+    let imageObj = {
+        channelId,
+        chat
+    }
 
     chatEvent.emit('receive', user);
+    imageEvent.emit('receive', imageObj);
 
     // if (data.text === '안녕하세요') {
     //     // 답장 형식

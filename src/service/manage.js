@@ -92,7 +92,8 @@ async function exec(methodObj, chat, channelId, attachmentId, client) {
             chatEvent.emit('saveImage', {
                 channelId,
                 chat,
-                attachmentId
+                attachmentId,
+                client
             });
             break;
     }

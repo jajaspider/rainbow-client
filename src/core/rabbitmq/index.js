@@ -104,7 +104,14 @@ const mapleNoticeMessage = async (data) => {
             chatEvent.emit('send', {
                 channelId: maplestoryRoom,
                 type: 'chat',
-                data
+                data,
+                client:'kakao'
+            });
+            chatEvent.emit('send', {
+                channelId: maplestoryRoom,
+                type: 'chat',
+                data,
+                client:'discord'
             });
         }
 
@@ -139,7 +146,14 @@ const loaNoticeMessage = async (data) => {
             chatEvent.emit('send', {
                 channelId: lostarkRoom,
                 type: 'chat',
-                data
+                data,
+                client:'kakao'
+            });
+            chatEvent.emit('send', {
+                channelId: lostarkRoom,
+                type: 'chat',
+                data,
+                client:'discord'
             });
         }
 

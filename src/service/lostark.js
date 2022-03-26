@@ -38,10 +38,10 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 client
             });
             break;
-            // return {
-            //     type: "sendChat",
-            //         result,
-            // };
+        // return {
+        //     type: "sendChat",
+        //         result,
+        // };
         case 'info':
             if (chat == '') {
                 url = `http://localhost:30003/v0/lostark/info/${encodeURIComponent(nickname)}`;
@@ -70,7 +70,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
 
             let character = _.get(responseData, 'payload.character');
             let server = _.get(character, 'server');
-            // let nickname = _.get(character, 'nickname');
+            let nickName = _.get(character, 'nickname');
             let job = _.get(character, 'job');
             let fightLevel = _.get(character, 'fightLevel');
             let itemLevel = _.get(character, 'itemLevel');
@@ -81,7 +81,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
             let engraveList = _.get(character, 'engraveList');
             let cardList = _.get(character, 'cardList');
 
-            let info = `${nickname} - ${server} | ${job}\n`;
+            let info = `${nickName} - ${server} | ${job}\n`;
             info += `전투레벨 : ${fightLevel}\n`;
             info += `아이템레벨 : ${itemLevel}\n`;
             info += `공격력 : ${attack}\n`;
@@ -109,10 +109,10 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 client
             });
             break;
-            // return {
-            //     type: "sendChat",
-            //         result: info,
-            // };
+        // return {
+        //     type: "sendChat",
+        //         result: info,
+        // };
 
         case "crystal":
             response = await axios.get(`http://localhost:30003/v0/lostark/crystal`);
@@ -191,10 +191,10 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 client
             });
             break;
-            // return {
-            //     type: "sendChat",
-            //         result: expandInfo,
-            // };
+        // return {
+        //     type: "sendChat",
+        //         result: expandInfo,
+        // };
         case "emoticon":
             let images = imageService.getImage('lostark');
             let emoticonList = `[로스트아크 이모티콘]\n${COMPRES}`;

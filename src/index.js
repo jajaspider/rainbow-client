@@ -59,6 +59,7 @@ chatEvent.on('saveImage', async (payload) => {
     let channel = kakaoClient.CLIENT.channelList._open._map.get(channelId);
     const attachmentId = _.get(payload, 'attachmentId');
     const chat = _.get(payload, 'chat');
+    const client = _.get(payload, 'client');
 
     let chatSplit = chat.split(" ");
     for (let i = 0; i < channel["_chatListStore"]["_chatList"].length; i += 1) {
@@ -67,8 +68,8 @@ chatEvent.on('saveImage', async (payload) => {
         }
         //이미지 확장자
         let ext = String(
-                channel["_chatListStore"]["_chatList"][i].attachment.url
-            )
+            channel["_chatListStore"]["_chatList"][i].attachment.url
+        )
             .split("/")
             .reverse()[0]
             .split(".")
@@ -111,13 +112,15 @@ chatEvent.on('saveImage', async (payload) => {
             chatEvent.emit('send', {
                 channelId,
                 type: 'chat',
-                data: '저장 성공'
+                data: '저장 성공',
+                client
             });
         } else {
             chatEvent.emit('send', {
                 channelId,
                 type: 'chat',
-                data: '등록 실패'
+                data: '등록 실패',
+                client
             });
         }
     }
@@ -144,6 +147,10 @@ chatEvent.on('send', async (payload) => {
         try {
             // 채널 이름 = channel.info.openLink.linkName;
             let channel = kakaoClient.CLIENT.channelList._open._map.get(channelId);
+            if (!channel) {
+                return;
+            }
+
             if (type === 'chat') {
                 let chat = _.get(payload, 'data');
                 let result = await channel.sendChat(chat);
@@ -156,7 +163,7 @@ chatEvent.on('send', async (payload) => {
                 // 2021.02 .06
                 // 카링 재로그인 추가
                 if (kakaoClient.kakaoLinkDate != new Date().getDate()) {
-                    await kakaoLogin();
+                    await kakaoClient.kakaoLogin();
                 }
 
                 payload = _.get(payload, 'data');
@@ -164,10 +171,10 @@ chatEvent.on('send', async (payload) => {
                 let templateArgs = _.get(payload, 'templateArgs');
                 await kakaoClient.kakaoLink.send(
                     `${channel.info.openLink.linkName}`, {
-                        link_ver: '4.0',
-                        template_id: templateId,
-                        template_args: templateArgs
-                    }, 'custom');
+                    link_ver: '4.0',
+                    template_id: templateId,
+                    template_args: templateArgs
+                }, 'custom');
             }
 
         } catch (e) {
@@ -178,6 +185,10 @@ chatEvent.on('send', async (payload) => {
         }
     } else if (client == 'discord') {
         const discordChannel = discordClient.channels.cache.get(channelId);
+        if (!discordChannel) {
+            return;
+        }
+
         if (type === 'chat') {
             let chat = _.get(payload, 'data');
             discordChannel.send(chat);
@@ -315,6 +326,7 @@ kakaoClient.CLIENT.on('chat', async (data, channel) => {
     let imageObj = {
         channelId,
         chat,
+        client: 'kakao'
     }
 
     chatEvent.emit('receive', user);

@@ -74,6 +74,7 @@ chatEvent.on('receive', async (user) => {
 imageEvent.on('receive', async (imageObj) => {
   let channelId = _.get(imageObj, 'channelId');
   let chat = _.get(imageObj, 'chat');
+  let client = _.get(imageObj, 'client');
 
   let roomTypes = await permissionRouter.router(channelId);
   if (_.includes(roomTypes, 'maplestory')) {

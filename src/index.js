@@ -198,7 +198,8 @@ chatEvent.on('send', async (payload) => {
                 embed.addField('인기도', String(_.get(character, 'pop')));
                 embed.addField('길드', String(_.get(character, 'guild')));
                 // let img = String(_.get(character, 'img')).replace("180/", "");
-                embed.setThumbnail('https://avatar.maplestory.nexon.com/Character/180/NLGIJLPOJJPICHGIENGEAIJADDCEFBGMAGLCJKOIGICKIGNLALDFOLOFDKKBOBDLHPBLHIFLJCALEAIAIFBMDKEJBDOLAGOEMHEJOGFLFCGHANKKCJJMOGIKKMNFMKCFCLGBILAKFOEHDDJKMKOECCEPPFNFGJNFACCOBHBLNCJLPNMCIOHEALPAIPMGEKCMBLPEOLIOKHNNKIFNACKBKCJHFHDMACFBMOPMDHNMLDHPABOAOFOMCELOKBPFFJBE.png');
+                embed.setImage('http://sonaapi.com:30003/muto/%ED%9D%91%ED%9D%91%ED%99%94%EC%B1%84.jpeg');
+                // embed.setThumbnail('https://avatar.maplestory.nexon.com/Character/180/NLGIJLPOJJPICHGIENGEAIJADDCEFBGMAGLCJKOIGICKIGNLALDFOLOFDKKBOBDLHPBLHIFLJCALEAIAIFBMDKEJBDOLAGOEMHEJOGFLFCGHANKKCJJMOGIKKMNFMKCFCLGBILAKFOEHDDJKMKOECCEPPFNFGJNFACCOBHBLNCJLPNMCIOHEALPAIPMGEKCMBLPEOLIOKHNNKIFNACKBKCJHFHDMACFBMOPMDHNMLDHPABOAOFOMCELOKBPFFJBE.png');
                 // embed.setImage('https://i.imgur.com/wSTFkRM.png');
                 embed.addFields({
                     name: '무릉도장',

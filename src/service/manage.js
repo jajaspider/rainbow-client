@@ -6,7 +6,7 @@ const {
     chatEvent
 } = require('../core/eventBridge');
 
-async function exec(methodObj, chat, channelId, attachmentId) {
+async function exec(methodObj, chat, channelId, attachmentId, client) {
     let command = _.get(methodObj, "name");
     let chatLength = chat.split(" ").length;
 
@@ -28,7 +28,6 @@ async function exec(methodObj, chat, channelId, attachmentId) {
 
             }).lean();
 
-
             if (_.isEmpty(result)) {
                 try {
                     await Permission.insertMany({
@@ -38,7 +37,8 @@ async function exec(methodObj, chat, channelId, attachmentId) {
                     chatEvent.emit('send', {
                         channelId,
                         type: 'chat',
-                        data: "추가 성공"
+                        data: "추가 성공",
+                        client
                     });
                     // return {
                     //     type: "sendChat",
@@ -48,7 +48,8 @@ async function exec(methodObj, chat, channelId, attachmentId) {
                     chatEvent.emit('send', {
                         channelId,
                         type: 'chat',
-                        data: "추가 실패"
+                        data: "추가 실패",
+                        client
                     });
                     // return {
                     //     type: "sendChat",
@@ -65,7 +66,8 @@ async function exec(methodObj, chat, channelId, attachmentId) {
                     chatEvent.emit('send', {
                         channelId,
                         type: 'chat',
-                        data: "삭제 성공"
+                        data: "삭제 성공",
+                        client
                     });
                     // return {
                     //     type: "sendChat",
@@ -75,7 +77,8 @@ async function exec(methodObj, chat, channelId, attachmentId) {
                     chatEvent.emit('send', {
                         channelId,
                         type: 'chat',
-                        data: "삭제 실패"
+                        data: "삭제 실패",
+                        client
                     });
                     // return {
                     //     type: "sendChat",
@@ -89,7 +92,8 @@ async function exec(methodObj, chat, channelId, attachmentId) {
             chatEvent.emit('saveImage', {
                 channelId,
                 chat,
-                attachmentId
+                attachmentId,
+                client
             });
             break;
     }

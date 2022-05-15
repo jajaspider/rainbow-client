@@ -2,7 +2,7 @@ const Lostark = require("../models/index").Lostark;
 const lostarkService = require("../service/lostark");
 const _ = require("lodash");
 
-async function router(command, chat, nickname, channelId) {
+async function router(command, chat, nickname, channelId, client) {
     let result = null;
     result = await Lostark.find({
         method: command,
@@ -18,7 +18,7 @@ async function router(command, chat, nickname, channelId) {
         return;
     }
 
-    await lostarkService.exec(result[0], chat, nickname, channelId);
+    await lostarkService.exec(result[0], chat, nickname, channelId, client);
 }
 
 module.exports = {

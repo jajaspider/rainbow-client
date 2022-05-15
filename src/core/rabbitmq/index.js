@@ -25,6 +25,9 @@ class RabbitMQ {
                         }),
                         channel.assertExchange('rainbow', 'topic'),
                         channel.prefetch(1),
+                        channel.assertQueue('notice.maplestory', {
+                            durable: true
+                        }),
                         channel.bindQueue('notice.maplestory', 'rainbow', 'notice'),
                         channel.consume('notice.maplestory', mapleNoticeMessage)
                     ],
@@ -34,6 +37,9 @@ class RabbitMQ {
                         }),
                         channel.assertExchange('rainbow', 'topic'),
                         channel.prefetch(1),
+                        channel.assertQueue('notice.lostark', {
+                            durable: true
+                        }),
                         channel.bindQueue('notice.lostark', 'rainbow', 'notice'),
                         channel.consume('notice.lostark', loaNoticeMessage)
                     ]
@@ -98,7 +104,14 @@ const mapleNoticeMessage = async (data) => {
             chatEvent.emit('send', {
                 channelId: maplestoryRoom,
                 type: 'chat',
-                data
+                data,
+                client:'kakao'
+            });
+            chatEvent.emit('send', {
+                channelId: maplestoryRoom,
+                type: 'chat',
+                data,
+                client:'discord'
             });
         }
 
@@ -133,7 +146,14 @@ const loaNoticeMessage = async (data) => {
             chatEvent.emit('send', {
                 channelId: lostarkRoom,
                 type: 'chat',
-                data
+                data,
+                client:'kakao'
+            });
+            chatEvent.emit('send', {
+                channelId: lostarkRoom,
+                type: 'chat',
+                data,
+                client:'discord'
             });
         }
 

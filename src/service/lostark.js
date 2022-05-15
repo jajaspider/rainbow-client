@@ -8,7 +8,7 @@ const {
 const COMPRES = "\u200b".repeat(500);
 const imageService = require('./imageService');
 
-async function exec(methodObj, chat, nickname, channelId) {
+async function exec(methodObj, chat, nickname, channelId, client) {
     let command = _.get(methodObj, "name");
     let chatLength = chat.split(" ").length;
     let response = null;
@@ -34,7 +34,8 @@ async function exec(methodObj, chat, nickname, channelId) {
             chatEvent.emit('send', {
                 channelId,
                 type: 'chat',
-                data: result
+                data: result,
+                client
             });
             break;
         // return {
@@ -57,7 +58,8 @@ async function exec(methodObj, chat, nickname, channelId) {
                 chatEvent.emit('send', {
                     channelId,
                     type: 'chat',
-                    data: errorMessage
+                    data: errorMessage,
+                    client
                 });
                 return;
                 // return {
@@ -68,7 +70,7 @@ async function exec(methodObj, chat, nickname, channelId) {
 
             let character = _.get(responseData, 'payload.character');
             let server = _.get(character, 'server');
-            // let nickname = _.get(character, 'nickname');
+            let nickName = _.get(character, 'nickname');
             let job = _.get(character, 'job');
             let fightLevel = _.get(character, 'fightLevel');
             let itemLevel = _.get(character, 'itemLevel');
@@ -79,7 +81,7 @@ async function exec(methodObj, chat, nickname, channelId) {
             let engraveList = _.get(character, 'engraveList');
             let cardList = _.get(character, 'cardList');
 
-            let info = `${nickname} - ${server} | ${job}\n`;
+            let info = `${nickName} - ${server} | ${job}\n`;
             info += `전투레벨 : ${fightLevel}\n`;
             info += `아이템레벨 : ${itemLevel}\n`;
             info += `공격력 : ${attack}\n`;
@@ -103,7 +105,8 @@ async function exec(methodObj, chat, nickname, channelId) {
             chatEvent.emit('send', {
                 channelId,
                 type: 'chat',
-                data: info
+                data: info,
+                client
             });
             break;
         // return {
@@ -122,7 +125,8 @@ async function exec(methodObj, chat, nickname, channelId) {
                 chatEvent.emit('send', {
                     channelId,
                     type: 'chat',
-                    data: errorMessage
+                    data: errorMessage,
+                    client
                 });
                 return;
 
@@ -139,7 +143,8 @@ async function exec(methodObj, chat, nickname, channelId) {
             chatEvent.emit('send', {
                 channelId,
                 type: 'chat',
-                data: crystalInfo
+                data: crystalInfo,
+                client
             });
             // return {
             //     type: "sendChat",
@@ -162,7 +167,8 @@ async function exec(methodObj, chat, nickname, channelId) {
                 chatEvent.emit('send', {
                     channelId,
                     type: 'chat',
-                    data: errorMessage
+                    data: errorMessage,
+                    client
                 });
                 return;
                 // return {
@@ -181,7 +187,8 @@ async function exec(methodObj, chat, nickname, channelId) {
             chatEvent.emit('send', {
                 channelId,
                 type: 'chat',
-                data: expandInfo
+                data: expandInfo,
+                client
             });
             break;
         // return {
@@ -198,7 +205,8 @@ async function exec(methodObj, chat, nickname, channelId) {
             chatEvent.emit('send', {
                 channelId,
                 type: 'chat',
-                data: emoticonList
+                data: emoticonList,
+                client
             });
             break;
 

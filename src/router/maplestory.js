@@ -2,7 +2,7 @@ const Maplestory = require("../models/index").Maplestory;
 const maplestoryService = require("../service/maplestory");
 const _ = require("lodash");
 
-async function router(command, chat, channelId) {
+async function router(command, chat, channelId, client) {
     let result = null;
     result = await Maplestory.find({
         method: command,
@@ -18,7 +18,7 @@ async function router(command, chat, channelId) {
         return;
     }
 
-    await maplestoryService.exec(result[0], chat, channelId);
+    await maplestoryService.exec(result[0], chat, channelId, client);
 }
 
 module.exports = {

@@ -318,7 +318,6 @@ async function exec(methodObj, chat, channelId, client) {
                 if (response.status != 200) {
                     return;
                 }
-                console.dir(response);
 
                 responseData = _.get(response, "data");
                 chatEvent.emit('send', {
@@ -331,7 +330,7 @@ async function exec(methodObj, chat, channelId, client) {
             else if (chatLength == 1) {
                 let params = chat.split(' ');
                 let response = await axios({
-                    url: `http://127.0.0.1:30003/v0/selection/maple/class/${params[0]}`,
+                    url: `http://127.0.0.1:30003/v0/selection/maple/class/${encodeURIComponent(params[0])}`,
                     method: 'get'
                 })
                 if (response.status != 200) {

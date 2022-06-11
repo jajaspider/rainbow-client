@@ -30,7 +30,7 @@ const {
     MessageAttachment
 } = require('discord.js');
 
-// const kakaoClient = require('../src/client/kakao');
+const kakaoClient = require('../src/client/kakao');
 const discordClient = require('../src/client/discord');
 
 let configPath = path.join(process.cwd(), 'config', 'rainbow.develop.yaml');
@@ -144,6 +144,7 @@ chatEvent.on('send', async (payload) => {
     let channelId = _.get(payload, 'channelId');
     const type = _.get(payload, 'type');
     if (client == 'kakao') {
+        // return;
         try {
             // 채널 이름 = channel.info.openLink.linkName;
             let channel = kakaoClient.CLIENT.channelList._open._map.get(channelId);
@@ -220,7 +221,6 @@ chatEvent.on('send', async (payload) => {
                     value: `${_.get(character, 'seed.stair')} / ${_.get(character, 'seed.time')}`,
                     inline: true
                 });
-                console.dir(embed);
 
                 discordChannel.send({
                     embeds: [embed]
@@ -292,59 +292,59 @@ chatEvent.on('send', async (payload) => {
 
 });
 
-// kakaoClient.CLIENT.on('chat', async (data, channel) => {
-//     const sender = data.getSenderInfo(channel);
-//     if (!sender) return;
+kakaoClient.CLIENT.on('chat', async (data, channel) => {
+    const sender = data.getSenderInfo(channel);
+    if (!sender) return;
 
-//     let channelId = _.get(channel, "_channel.channelId").toString();
-//     let userId = null;
-//     try {
-//         userId = _.get(sender, 'linkId').toString();
-//     } catch (e) {
-//         // 오픈 프로필이 아니라면 userNumber는 null상태 유지
-//     }
+    let channelId = _.get(channel, "_channel.channelId").toString();
+    let userId = null;
+    try {
+        userId = _.get(sender, 'linkId').toString();
+    } catch (e) {
+        // 오픈 프로필이 아니라면 userNumber는 null상태 유지
+    }
 
-//     let nickname = _.get(sender, "nickname");
-//     nickname = nickname.split('/')[0].trim();
-//     let chat = data.text;
-//     let attachmentId = null;
-//     try {
-//         attachmentId = String(data.chat["attachment"]["src_logId"]);
-//     } catch (e) {
-//         //ignore
-//     }
+    let nickname = _.get(sender, "nickname");
+    nickname = nickname.split('/')[0].trim();
+    let chat = data.text;
+    let attachmentId = null;
+    try {
+        attachmentId = String(data.chat["attachment"]["src_logId"]);
+    } catch (e) {
+        //ignore
+    }
 
-//     const user = {
-//         channelId,
-//         userId,
-//         nickname,
-//         chat,
-//         attachmentId,
-//         client: 'kakao',
-//     };
+    const user = {
+        channelId,
+        userId,
+        nickname,
+        chat,
+        attachmentId,
+        client: 'kakao',
+    };
 
-//     let imageObj = {
-//         channelId,
-//         chat,
-//         client: 'kakao'
-//     }
+    let imageObj = {
+        channelId,
+        chat,
+        client: 'kakao'
+    }
 
-//     chatEvent.emit('receive', user);
-//     imageEvent.emit('receive', imageObj);
+    chatEvent.emit('receive', user);
+    imageEvent.emit('receive', imageObj);
 
-//     // if (data.text === '안녕하세요') {
-//     //     // 답장 형식
-//     //     // 안녕하세요 @xxx
-//     //     channel.sendChat(
-//     //         new nodeKakao.ChatBuilder()
-//     //         .append(new nodeKakao.ReplyContent(data.chat))
-//     //         .text('안녕하세요 ')
-//     //         .append(new nodeKakao.MentionContent(sender))
-//     //         .build(nodeKakao.KnownChatType.REPLY));
-//     //     // 일반 텍스트
-//     //     // channel.sendChat('안녕하세요');
-//     // }
-// });
+    // if (data.text === '안녕하세요') {
+    //     // 답장 형식
+    //     // 안녕하세요 @xxx
+    //     channel.sendChat(
+    //         new nodeKakao.ChatBuilder()
+    //         .append(new nodeKakao.ReplyContent(data.chat))
+    //         .text('안녕하세요 ')
+    //         .append(new nodeKakao.MentionContent(sender))
+    //         .build(nodeKakao.KnownChatType.REPLY));
+    //     // 일반 텍스트
+    //     // channel.sendChat('안녕하세요');
+    // }
+});
 
 discordClient.on('messageCreate', async (msg) => {
     let isBot = _.get(msg, 'author.bot');

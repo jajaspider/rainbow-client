@@ -144,6 +144,7 @@ chatEvent.on('send', async (payload) => {
     let channelId = _.get(payload, 'channelId');
     const type = _.get(payload, 'type');
     if (client == 'kakao') {
+        // return;
         try {
             // 채널 이름 = channel.info.openLink.linkName;
             let channel = kakaoClient.CLIENT.channelList._open._map.get(channelId);
@@ -220,7 +221,6 @@ chatEvent.on('send', async (payload) => {
                     value: `${_.get(character, 'seed.stair')} / ${_.get(character, 'seed.time')}`,
                     inline: true
                 });
-                console.dir(embed);
 
                 discordChannel.send({
                     embeds: [embed]

@@ -8,8 +8,7 @@ const {
 const COMPRES = "\u200b".repeat(500);
 const imageService = require('./imageService');
 
-async function exec(methodObj, chat, channelId, client) {
-    // let roomName = channel.info.openLink.linkName;
+async function exec(methodObj, chat, nickname, channelId, client) {
     let command = _.get(methodObj, "name");
     let chatLength = chat.split(" ").length;
     let url = null;
@@ -35,10 +34,6 @@ async function exec(methodObj, chat, channelId, client) {
                     client
                 });
                 return;
-                // return {
-                //     type: "sendChat",
-                //     result: data.payload.message,
-                // };
             } else if (chatLength >= 1) {
                 return;
             }
@@ -65,17 +60,15 @@ async function exec(methodObj, chat, channelId, client) {
                 client
             });
             break;
-        // return {
-        //     type: "sendChat",
-        //         result,
-        // };
         case 'info':
             if (chat == "") {
-                return;
+                url = `http://localhost:30003/v0/maplestory/info/${encodeURIComponent(nickname)}`;
             } else if (chatLength > 1) {
                 return;
+            } else {
+                url = `http://localhost:30003/v0/maplestory/info/${encodeURIComponent(chat)}`;
             }
-            url = `http://localhost:30003/v0/maplestory/info/${encodeURIComponent(chat)}`;
+
             response = await axios.get(url);
             if (response.status != 200) {
                 return;
@@ -90,10 +83,6 @@ async function exec(methodObj, chat, channelId, client) {
                     client
                 });
                 return;
-                // return {
-                //     type: "sendChat",
-                //     result: errorMessage,
-                // }
             }
 
             //정보 명령어용 템플릿
@@ -136,14 +125,6 @@ async function exec(methodObj, chat, channelId, client) {
                     client
                 });
             }
-            // return {
-            //     type: "kakaolink",
-            //         result: {
-            //             roomName,
-            //             templateId,
-            //             templateArgs
-            //         },
-            // };
             //카카오링크 추가
             break;
         case 'starforce':
@@ -171,10 +152,6 @@ async function exec(methodObj, chat, channelId, client) {
                     client
                 });
                 return;
-                // return {
-                //     type: "sendChat",
-                //     result: 'api 데이터 수신 실패',
-                // };
             }
             responseData = _.get(response, "data");
             errorMessage = _.get(responseData, 'payload.message');
@@ -185,10 +162,6 @@ async function exec(methodObj, chat, channelId, client) {
                     data: errorMessage,
                     client
                 });
-                // return {
-                //     type: "sendChat",
-                //     result: errorMessage,
-                // }
             }
 
             let starforce = _.get(responseData, 'payload.starforce');
@@ -198,10 +171,6 @@ async function exec(methodObj, chat, channelId, client) {
                 data: `방어구 ${params[1]}성 강화시\n스탯 : ${starforce.stat}\n공격력 : ${starforce.attack}`,
                 client
             });
-            // return {
-            //     type: "sendChat",
-            //         result: `방어구 ${params[1]}성 강화시\n스탯 : ${starforce.stat}\n공격력 : ${starforce.attack}`
-            // }
             break;
 
         case "growth":
@@ -225,10 +194,6 @@ async function exec(methodObj, chat, channelId, client) {
                     data: responseData.payload.percent,
                     client
                 });
-                // return {
-                //     type: "sendChat",
-                //     result: responseData.payload.percent,
-                // };
             }
             break;
 
@@ -266,7 +231,6 @@ async function exec(methodObj, chat, channelId, client) {
             }
 
             let image = _.get(responseData, 'payload.image');
-            // console.dir(`${image.imageUrl.split("/")[0]}/${encodeURIComponent(image.imageUrl.split("/")[1])}`);
 
             templateId = 72506;
             templateArgs = {
@@ -326,8 +290,7 @@ async function exec(methodObj, chat, channelId, client) {
                     data: responseData.payload.message,
                     client
                 });
-            }
-            else if (chatLength == 1) {
+            } else if (chatLength == 1) {
                 let params = chat.split(' ');
                 let response = await axios({
                     url: `http://127.0.0.1:30003/v0/selection/maple/class/${encodeURIComponent(params[0])}`,
@@ -350,6 +313,51 @@ async function exec(methodObj, chat, channelId, client) {
                 // };
             }
             break;
+
+        case "unionInfo":
+            if (chat == "") {
+                url = `http://127.0.0.1:30003/v0/maplestory/union/${encodeURIComponent(nickname)}`
+            } else if (chatLength == 1) {
+                let params = chat.split(' ');
+                url = `http://127.0.0.1:30003/v0/maplestory/union/${encodeURIComponent(params[0])}`
+            }
+
+            response = await axios.get(url);
+            if (response.status != 200) {
+                return;
+            }
+
+            responseData = _.get(response, "data");
+            errorMessage = _.get(responseData, 'payload.message');
+            if (errorMessage) {
+                chatEvent.emit('send', {
+                    channelId,
+                    type: 'chat',
+                    data: errorMessage,
+                    client
+                });
+                return;
+                // return {
+                //     type: "sendChat",
+                //     result: errorMessage,
+                // }
+            }
+
+            let characterName = _.get(responseData, 'payload.character.name');
+            let unionRanking = _.get(responseData, 'payload.character.unionRanking');
+            let unionLevel = _.get(responseData, 'payload.character.unionLevel');
+            let unionPower = _.get(responseData, 'payload.character.unionPower');
+            let unionCoinPerDay = _.get(responseData, 'payload.character.unionCoinPerDay');
+            let message = `[${characterName}님의 유니온 정보]\n랭킹 : ${unionRanking}\n레벨 : ${unionLevel}\n공격력 : ${unionPower}\n일일 코인 획득량 : ${unionCoinPerDay}`;
+
+            chatEvent.emit('send', {
+                channelId,
+                type: 'chat',
+                data: message,
+                client
+            });
+            break;
+
         default:
             break;
     }

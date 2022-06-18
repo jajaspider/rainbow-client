@@ -18,7 +18,7 @@ async function router(command, chat, nickname, channelId, client) {
         return;
     }
 
-    await maplestoryService.exec(result[0], nickname, chat, channelId, client);
+    await maplestoryService.exec(result[0], chat, nickname,channelId, client);
 }
 
 module.exports = {

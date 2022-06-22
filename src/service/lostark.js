@@ -17,11 +17,11 @@ async function exec(methodObj, chat, nickname, channelId, client) {
     let url = null;
     switch (command) {
         case "help":
-            let maplestoryMethods = await Lostark.find({}).lean();
+            let lostarkMethods = await Lostark.find({}).lean();
 
             let result = `[로스트아크 명령어]${COMPRES}`;
             try {
-                await async.mapLimit(maplestoryMethods, 5, async (methods) => {
+                await async.mapLimit(lostarkMethods, 5, async (methods) => {
                     let method = _.get(methods, "method");
                     let alias = _.get(methods, "alias");
                     let description = _.get(methods, "description");
@@ -38,10 +38,6 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 client
             });
             break;
-        // return {
-        //     type: "sendChat",
-        //         result,
-        // };
         case 'info':
             if (chat == '') {
                 url = `http://localhost:30003/v0/lostark/info/${encodeURIComponent(nickname)}`;
@@ -62,10 +58,6 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     client
                 });
                 return;
-                // return {
-                //     type: "sendChat",
-                //     result: errorMessage,
-                // }
             }
 
             let character = _.get(responseData, 'payload.character');
@@ -109,10 +101,6 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 client
             });
             break;
-        // return {
-        //     type: "sendChat",
-        //         result: info,
-        // };
 
         case "crystal":
             response = await axios.get(`http://localhost:30003/v0/lostark/crystal`);
@@ -129,11 +117,6 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     client
                 });
                 return;
-
-                // return {
-                //     type: "sendChat",
-                //     result: errorMessage,
-                // }
             }
             let crystal = _.get(responseData, 'payload.result');
 
@@ -146,10 +129,6 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 data: crystalInfo,
                 client
             });
-            // return {
-            //     type: "sendChat",
-            //         result: crystalInfo,
-            // };
             break;
         case "expand":
             if (chat == '') {
@@ -171,10 +150,6 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     client
                 });
                 return;
-                // return {
-                //     type: "sendChat",
-                //     result: errorMessage,
-                // }
             }
             let expandList = _.get(responseData, 'payload.result');
 
@@ -191,10 +166,6 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 client
             });
             break;
-        // return {
-        //     type: "sendChat",
-        //         result: expandInfo,
-        // };
         case "emoticon":
             let images = imageService.getImage('lostark');
             let emoticonList = `[로스트아크 이모티콘]\n${COMPRES}`;

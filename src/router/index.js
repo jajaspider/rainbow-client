@@ -60,7 +60,7 @@ chatEvent.on('receive', async (user) => {
     let roomTypes = await permissionRouter.router(channelId);
 
     if (_.includes(roomTypes, 'maplestory')) {
-      await maplestoryRouter.router(command, chat, channelId, client);
+      await maplestoryRouter.router(command, chat, nickname, channelId, client);
     }
 
     if (_.includes(roomTypes, 'lostark')) {

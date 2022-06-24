@@ -160,6 +160,15 @@ chatEvent.on('send', async (payload) => {
                         chatEvent.emit('send', payload);
                     }, 1000);
                 }
+                let next = _.get(payload, 'data.next');
+                if (next != null) {
+                    chatEvent.emit('send', {
+                        channelId,
+                        type: 'chat',
+                        data: next,
+                        client
+                    });
+                }
             } else if (type === 'kakaolink') {
                 // 2021.02 .06
                 // 카링 재로그인 추가
@@ -176,6 +185,16 @@ chatEvent.on('send', async (payload) => {
                     template_id: templateId,
                     template_args: templateArgs
                 }, 'custom');
+
+                let next = _.get(payload, 'next');
+                if (next != null) {
+                    chatEvent.emit('send', {
+                        channelId,
+                        type: 'chat',
+                        data: next,
+                        client
+                    });
+                }
             }
 
         } catch (e) {
@@ -193,6 +212,15 @@ chatEvent.on('send', async (payload) => {
         if (type === 'chat') {
             let chat = _.get(payload, 'data');
             discordChannel.send(chat);
+            let next = _.get(payload, 'data.next');
+            if (next != null) {
+                chatEvent.emit('send', {
+                    channelId,
+                    type: 'chat',
+                    data: next,
+                    client
+                });
+            }
         } else if (type === 'embed') {
             // console.dir(payload)
             let subType = _.get(payload, 'subType');

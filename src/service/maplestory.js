@@ -418,8 +418,8 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 await rainbowUtil.sleep(1000);
                 let message = `나머지 ${eventList.length - 5}개 이벤트\n${COMPRES}`;
                 for (let i = 5; i < eventList.length; i += 1) {
-                    message += `\n${eventList[i].title}`;
-                    message += `\n${eventList[i].link}`;
+                    message += `\n\n${eventList[i].title}`;
+                    message += `\nhttps://maplestory.nexon.com${eventList[i].link}`;
                     message += `\n${eventList[i].date}`;
                 }
                 // 각각의 타입이 정식 지원이되면 해당하는 send는 한개로 합쳐도 상관없음

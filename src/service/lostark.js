@@ -208,7 +208,6 @@ async function exec(methodObj, chat, nickname, channelId, client) {
 
             templateArgs = {};
             for (let i = 0; i < (eventList.length <= 5 ? eventList.length : 5); i += 1) {
-                console.dir(eventList[i]);
                 templateArgs[`event_name_${i + 1}`] = eventList[i].title;
                 let term = (eventList[i].term).replace('이벤트 기간 : ', '')
                 templateArgs[`event_contents_${i + 1}`] = term;
@@ -218,13 +217,36 @@ async function exec(methodObj, chat, nickname, channelId, client) {
 
             templateId = 78643;
 
+            let nextMessage = null;
+            if (eventList.length > 5) {
+                await rainbowUtil.sleep(1000);
+                nextMessage = `나머지 ${eventList.length - 5}개 이벤트\n${COMPRES}`;
+                for (let i = 5; i < eventList.length; i += 1) {
+                    nextMessage += `\n\n${eventList[i].title}`;
+                    nextMessage += `\nhttps://maplestory.nexon.com${eventList[i].link}`;
+                    nextMessage += `\n${eventList[i].date}`;
+                }
+                // 각각의 타입이 정식 지원이되면 해당하는 send는 한개로 합쳐도 상관없음
+                // if (client == 'kakao') {
+                //     chatEvent.emit('send', {
+                //         channelId,
+                //         type: 'chat',
+                //         data: message,
+                //         client
+                //     });
+                // } else if (client == 'discord') {
+                //     // 현재는 skip
+                // }
+            }
+
             if (client == 'kakao') {
                 chatEvent.emit('send', {
                     channelId,
                     type: 'kakaolink',
                     data: {
                         templateId,
-                        templateArgs
+                        templateArgs,
+                        next: nextMessage
                     },
                     client
                 });
@@ -237,29 +259,6 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 //     client
                 // });
             }
-
-            if (eventList.length > 5) {
-                await rainbowUtil.sleep(1000);
-                let message = `나머지 ${eventList.length - 5}개 이벤트\n${COMPRES}`;
-                for (let i = 5; i < eventList.length; i += 1) {
-                    message += `\n${eventList[i].title}`;
-                    message += `\n${eventList[i].link}`;
-                    message += `\n${eventList[i].term}`;
-                    message += `\n${eventList[i].receive}`;
-                }
-                // 각각의 타입이 정식 지원이되면 해당하는 send는 한개로 합쳐도 상관없음
-                if (client == 'kakao') {
-                    chatEvent.emit('send', {
-                        channelId,
-                        type: 'chat',
-                        data: message,
-                        client
-                    });
-                } else if (client == 'discord') {
-                    // 현재는 skip
-                }
-            }
-
 
             break;
 

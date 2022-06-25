@@ -68,8 +68,8 @@ chatEvent.on('saveImage', async (payload) => {
         }
         //이미지 확장자
         let ext = String(
-            channel["_chatListStore"]["_chatList"][i].attachment.url
-        )
+                channel["_chatListStore"]["_chatList"][i].attachment.url
+            )
             .split("/")
             .reverse()[0]
             .split(".")
@@ -92,9 +92,20 @@ chatEvent.on('saveImage', async (payload) => {
                 console.dir(err);
             });
 
+        let requestType = null;
+        let maplestoryTypes = ['maplestory', 'maple', '메이플', '메이플스토리'];
+        let lostarkTypes = ['lostark', '로아', '로스트아크', 'loa'];
+        if (_.includes(maplestoryTypes, chatSplit[0])) {
+            requestType = 'maplestory';
+        } else if (_.includes(lostarkTypes, chatSplit[0])) {
+            requestType = 'lostark';
+        } else {
+            return;
+        }
+
         const formData = new FormData();
         formData.append("file", fs.createReadStream(fileName));
-        formData.append("type", chatSplit[0]);
+        formData.append("type", requestType);
         formData.append("name", chatSplit[1]);
 
         const requestConfig = {
@@ -103,7 +114,7 @@ chatEvent.on('saveImage', async (payload) => {
             },
         }
 
-        let response = await axios.post('http://sonaapi.com:30003/v0/images/upload', formData, requestConfig);
+        let response = await axios.post('http://localhost:30003/v0/images/upload', formData, requestConfig);
         responseData = _.get(response, "data");
         let image = _.get(responseData, 'payload.image');
         if (responseData.isSuccess) {
@@ -125,6 +136,70 @@ chatEvent.on('saveImage', async (payload) => {
         }
     }
 });
+
+chatEvent.on('deleteImage', async (payload) => {
+    console.dir({
+        method: 'chatEvent, deleteImage',
+        payload
+    }, {
+        depth: null
+    });
+
+    /*
+    {
+        channelId,
+        chat,
+        attachmentId,
+        client
+    }
+    */
+    let channelId = _.get(payload, 'channelId');
+    let client = _.get(payload, 'client');
+
+    let chat = _.get(payload, 'chat');
+    let chatSplit = _.split(chat, " ");
+
+    let name = chatSplit[1];
+
+    let requestType = null;
+    let maplestoryTypes = ['maplestory', 'maple', '메이플', '메이플스토리'];
+    let lostarkTypes = ['lostark', '로아', '로스트아크', 'loa'];
+    if (_.includes(maplestoryTypes, chatSplit[0])) {
+        requestType = 'maplestory';
+    } else if (_.includes(lostarkTypes, chatSplit[0])) {
+        requestType = 'lostark';
+    } else {
+        return;
+    }
+
+    //router.delete('/:type/:name'
+    let response = await axios.delete(`http://localhost:30003/v0/images/${requestType}/${encodeURIComponent(name)}`);
+    let responseData = _.get(response, 'data');
+
+    //success
+    if (responseData.isSuccess) {
+        imageEvent.emit('delete', {
+            type: requestType,
+            name
+        });
+
+        chatEvent.emit('send', {
+            channelId,
+            type: 'chat',
+            data: "삭제 성공",
+            client
+        });
+    } else {
+        chatEvent.emit('send', {
+            channelId,
+            type: 'chat',
+            data: "삭제 실패",
+            client
+        });
+    }
+
+
+})
 
 chatEvent.on('send', async (payload) => {
     console.dir({
@@ -181,10 +256,10 @@ chatEvent.on('send', async (payload) => {
                 let templateArgs = _.get(payload, 'templateArgs');
                 await kakaoClient.kakaoLink.send(
                     `${channel.info.openLink.linkName}`, {
-                    link_ver: '4.0',
-                    template_id: templateId,
-                    template_args: templateArgs
-                }, 'custom');
+                        link_ver: '4.0',
+                        template_id: templateId,
+                        template_args: templateArgs
+                    }, 'custom');
 
                 let next = _.get(payload, 'next');
                 if (next != null) {

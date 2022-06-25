@@ -149,3 +149,7 @@ imageEvent.on('receive', async (imageObj) => {
 imageEvent.on('save', (image) => {
   imageService.addImage(image.type, image);
 })
+
+imageEvent.on('delete', (image) => {
+  imageService.deleteImage(image);
+})

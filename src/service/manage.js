@@ -96,6 +96,15 @@ async function exec(methodObj, chat, channelId, attachmentId, client) {
                 client
             });
             break;
+        case 'deleteEmoticon':
+            chatEvent.emit('deleteImage', {
+                channelId,
+                chat,
+                attachmentId,
+                client
+            });
+            break;
+
     }
 }
 

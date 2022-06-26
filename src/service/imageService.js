@@ -14,8 +14,11 @@ class ImageService {
         let images = _.get(responseData, 'payload.images');
 
         for (let allowType of this.allowType) {
-            this.imageCache[allowType] = _.filter(images, { "type": allowType });
+            this.imageCache[allowType] = _.filter(images, {
+                "type": allowType
+            });
         }
+        console.dir(this.imageCache['lostark']);
     }
 
     addImage(type, image) {
@@ -24,6 +27,12 @@ class ImageService {
 
     getImage(type) {
         return this.imageCache[type];
+    }
+
+    deleteImage(image) {
+        this.imageCache[image.type] = _.filter(this.imageCache[image.type], (target) => {
+            return target.name != image.name
+        });
     }
 }
 

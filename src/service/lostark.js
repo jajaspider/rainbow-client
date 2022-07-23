@@ -1,13 +1,20 @@
 const _ = require("lodash");
 const axios = require("axios");
-const Lostark = require("../models/index").Lostark;
+const path = require('path');
+const fs = require('fs');
+const yaml = require('js-yaml');
 const async = require("async");
+
+const Lostark = require("../models/index").Lostark;
 const {
     chatEvent
 } = require('../core/eventBridge');
 const COMPRES = "\u200b".repeat(500);
 const imageService = require('./imageService');
 const rainbowUtil = require('../utils');
+
+let configPath = path.join(process.cwd(), 'config', 'rainbow.develop.yaml');
+let config = yaml.load(fs.readFileSync(configPath));
 
 async function exec(methodObj, chat, nickname, channelId, client) {
     let command = _.get(methodObj, "name");

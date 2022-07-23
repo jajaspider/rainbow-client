@@ -1,11 +1,17 @@
 const _ = require("lodash");
 const axios = require("axios");
-const Common = require("../models/index").Common;
 const async = require("async");
+const path = require('path');
+const fs = require('fs');
+const yaml = require('js-yaml');
+
+const Common = require("../models/index").Common;
 const {
   chatEvent
 } = require('../core/eventBridge');
 const COMPRES = "\u200b".repeat(500);
+let configPath = path.join(process.cwd(), 'config', 'rainbow.develop.yaml');
+let config = yaml.load(fs.readFileSync(configPath));
 
 async function exec(methodObj, chat, nickname, channelId, client) {
   let command = _.get(methodObj, "name");

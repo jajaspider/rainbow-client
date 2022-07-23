@@ -92,8 +92,7 @@ imageEvent.on('receive', async (imageObj) => {
     if (searchImage) {
       let templateId = 72506;
       let templateArgs = {
-        imageUrl: `http://${_.get(config, 'site.domain')}:30003/${searchImage.imageUrl.split("/")[0]}/${encodeURIComponent(searchImage.imageUrl.split("/")[1])}`,
-        imageW: searchImage.imageW,
+        imageUrl: `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/${searchImage.imageUrl.split("/")[0]}/${encodeURIComponent(searchImage.imageUrl.split("/")[1])}`, imageW: searchImage.imageW,
         imageH: searchImage.imageH
       }
       if (client == 'kakao') {
@@ -126,7 +125,7 @@ imageEvent.on('receive', async (imageObj) => {
     if (searchImage) {
       let templateId = 72506;
       let templateArgs = {
-        imageUrl: `http://${_.get(config, 'site.domain')}:30003/${searchImage.imageUrl.split("/")[0]}/${encodeURIComponent(searchImage.imageUrl.split("/")[1])}`,
+        imageUrl: `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/${searchImage.imageUrl.split("/")[0]}/${encodeURIComponent(searchImage.imageUrl.split("/")[1])}`,
         imageW: searchImage.imageW,
         imageH: searchImage.imageH
       }

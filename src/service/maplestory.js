@@ -1,13 +1,20 @@
 const _ = require("lodash");
 const axios = require("axios");
-const Maplestory = require("../models/index").Maplestory;
 const async = require("async");
+const path = require('path');
+const fs = require('fs');
+const yaml = require('js-yaml');
+
+const Maplestory = require("../models/index").Maplestory;
 const {
     chatEvent
 } = require('../core/eventBridge');
 const COMPRES = "\u200b".repeat(500);
 const imageService = require('./imageService');
 const rainbowUtil = require('../utils');
+
+let configPath = path.join(process.cwd(), 'config', 'rainbow.develop.yaml');
+let config = yaml.load(fs.readFileSync(configPath));
 
 async function exec(methodObj, chat, nickname, channelId, client) {
     let command = _.get(methodObj, "name");
@@ -71,11 +78,13 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/maplestory/info/${encodeURIComponent(chat)}`;
             }
 
+            console.dir(url);
             response = await axios.get(url);
             if (response.status != 200) {
                 return;
             }
             responseData = _.get(response, "data");
+            console.dir(responseData);
             errorMessage = _.get(responseData, 'payload.message');
             if (errorMessage) {
                 chatEvent.emit('send', {

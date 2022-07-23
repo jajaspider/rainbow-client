@@ -21,7 +21,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
             if (chat == "") {
                 let type = _.get(methodObj, "params.type");
                 let result = await axios.get(
-                    `http://localhost:30003/v0/${command}/${type}`
+                    `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/${command}/${type}`
                 );
                 if (result.status != 200) {
                     return {};
@@ -52,7 +52,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     result += `\n\n명령어 : ${method}\n대체 명령어 : ${alias}\n설명 : ${description}`;
                 });
             } catch (e) {
-                console.dir(e);
+                // console.dir(e);
             }
 
             chatEvent.emit('send', {
@@ -64,11 +64,11 @@ async function exec(methodObj, chat, nickname, channelId, client) {
             break;
         case 'info':
             if (chat == "") {
-                url = `http://localhost:30003/v0/maplestory/info/${encodeURIComponent(nickname)}`;
+                url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/maplestory/info/${encodeURIComponent(nickname)}`;
             } else if (chatLength > 1) {
                 return;
             } else {
-                url = `http://localhost:30003/v0/maplestory/info/${encodeURIComponent(chat)}`;
+                url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/maplestory/info/${encodeURIComponent(chat)}`;
             }
 
             response = await axios.get(url);
@@ -143,7 +143,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 //     result: '잘못입력하셨습니다.',
                 // }
             }
-            url = `http://localhost:30003/v0/maplestory/starforce/${chatSplit[0]}/${chatSplit[1]}`;
+            url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/maplestory/starforce/${chatSplit[0]}/${chatSplit[1]}`;
             response = await axios.get(url);
             if (response.status != 200) {
                 chatEvent.emit('send', {
@@ -178,7 +178,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
             if (chatLength == 1) {
                 let type = _.get(methodObj, "params.type");
                 let response = await axios({
-                    url: `http://localhost:30003/v0/maplestory/growth/${chat}`,
+                    url: `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/maplestory/growth/${chat}`,
                     method: 'get',
                     data: {
                         type
@@ -209,7 +209,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 return;
             }
 
-            url = `http://localhost:30003/v0/images/muto/${encodeURIComponent(chat)}`;
+            url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/images/muto/${encodeURIComponent(chat)}`;
             response = await axios.get(url);
             if (response.status != 200) {
                 chatEvent.emit('send', {

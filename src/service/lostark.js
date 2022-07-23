@@ -29,7 +29,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     result += `\n\n명령어 : ${method}\n대체 명령어 : ${alias}\n설명 : ${description}`;
                 });
             } catch (e) {
-                console.dir(e);
+                // console.dir(e);
             }
 
             chatEvent.emit('send', {
@@ -41,9 +41,9 @@ async function exec(methodObj, chat, nickname, channelId, client) {
             break;
         case 'info':
             if (chat == '') {
-                url = `http://localhost:30003/v0/lostark/info/${encodeURIComponent(nickname)}`;
+                url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/info/${encodeURIComponent(nickname)}`;
             } else if (chatLength == 1) {
-                url = `http://localhost:30003/v0/lostark/info/${encodeURIComponent(chat)}`;
+                url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/info/${encodeURIComponent(chat)}`;
             }
             response = await axios.get(url);
             if (response.status != 200) {
@@ -104,7 +104,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
             break;
 
         case "crystal":
-            response = await axios.get(`http://localhost:30003/v0/lostark/crystal`);
+            response = await axios.get(`${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/crystal`);
             if (response.status != 200) {
                 return;
             }
@@ -133,9 +133,9 @@ async function exec(methodObj, chat, nickname, channelId, client) {
             break;
         case "expand":
             if (chat == '') {
-                url = `http://localhost:30003/v0/lostark/expand/${encodeURIComponent(nickname)}`;
+                url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/expand/${encodeURIComponent(nickname)}`;
             } else if (chatLength == 1) {
-                url = `http://localhost:30003/v0/lostark/expand/${encodeURIComponent(chat)}`;
+                url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/expand/${encodeURIComponent(chat)}`;
             }
             response = await axios.get(url);
             if (response.status != 200) {

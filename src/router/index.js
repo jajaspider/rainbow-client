@@ -1,4 +1,8 @@
 const _ = require("lodash");
+const path = require('path');
+const yaml = require('js-yaml');
+const fs = require('fs');
+
 const commonRouter = require("./common");
 const permissionRouter = require("./permission");
 const manageRouter = require("./manage");
@@ -9,6 +13,10 @@ const {
   imageEvent
 } = require('../core/eventBridge');
 const imageService = require('../service/imageService');
+
+let configPath = path.join(process.cwd(), 'config', 'rainbow.develop.yaml');
+let config = yaml.load(fs.readFileSync(configPath));
+
 
 chatEvent.on('receive', async (user) => {
   try {
@@ -67,7 +75,7 @@ chatEvent.on('receive', async (user) => {
       await lostarkRouter.router(command, chat, nickname, channelId, client);
     }
   } catch (e) {
-    console.dir(e);
+    // console.dir(e);
   }
 });
 
@@ -84,7 +92,7 @@ imageEvent.on('receive', async (imageObj) => {
     if (searchImage) {
       let templateId = 72506;
       let templateArgs = {
-        imageUrl: `http://sonaapi.com:30003/${searchImage.imageUrl.split("/")[0]}/${encodeURIComponent(searchImage.imageUrl.split("/")[1])}`,
+        imageUrl: `http://${_.get(config, 'site.domain')}:30003/${searchImage.imageUrl.split("/")[0]}/${encodeURIComponent(searchImage.imageUrl.split("/")[1])}`,
         imageW: searchImage.imageW,
         imageH: searchImage.imageH
       }
@@ -118,7 +126,7 @@ imageEvent.on('receive', async (imageObj) => {
     if (searchImage) {
       let templateId = 72506;
       let templateArgs = {
-        imageUrl: `http://sonaapi.com:30003/${searchImage.imageUrl.split("/")[0]}/${encodeURIComponent(searchImage.imageUrl.split("/")[1])}`,
+        imageUrl: `http://${_.get(config, 'site.domain')}:30003/${searchImage.imageUrl.split("/")[0]}/${encodeURIComponent(searchImage.imageUrl.split("/")[1])}`,
         imageW: searchImage.imageW,
         imageH: searchImage.imageH
       }

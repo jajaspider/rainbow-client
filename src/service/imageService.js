@@ -1,5 +1,11 @@
 const axios = require("axios");
 const _ = require('lodash');
+const path = require('path');
+const fs = require('fs');
+const yaml = require('js-yaml');
+
+let configPath = path.join(process.cwd(), 'config', 'rainbow.develop.yaml');
+let config = yaml.load(fs.readFileSync(configPath));
 
 class ImageService {
     constructor() {
@@ -9,7 +15,7 @@ class ImageService {
     }
 
     async init() {
-        let response = await axios.get('http://localhost:30003/v0/images');
+        let response = await axios.get(`http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/images`);
         let responseData = _.get(response, 'data');
         let images = _.get(responseData, 'payload.images');
 
@@ -18,7 +24,6 @@ class ImageService {
                 "type": allowType
             });
         }
-        console.dir(this.imageCache['lostark']);
     }
 
     addImage(type, image) {

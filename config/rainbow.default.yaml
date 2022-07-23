@@ -16,3 +16,7 @@ rabbitmq:
 
 discord:
   token: "your-token"
+
+site:
+  domain: "your-domain"
+  port: 'your-port(int)'

@@ -11,7 +11,8 @@ const rainbowUtil = require('../utils');
 
 async function exec(methodObj, chat, nickname, channelId, client) {
     let command = _.get(methodObj, "name");
-    let chatLength = chat.split(" ").length;
+    let chatSplit = chat.split(" ");
+    let chatLength = chatSplit.length;
     let url = null;
     let templateId = null;
     let templateArgs = null;
@@ -142,8 +143,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 //     result: '잘못입력하셨습니다.',
                 // }
             }
-            let params = chat.split(" ");
-            url = `http://localhost:30003/v0/maplestory/starforce/${params[0]}/${params[1]}`;
+            url = `http://localhost:30003/v0/maplestory/starforce/${chatSplit[0]}/${chatSplit[1]}`;
             response = await axios.get(url);
             if (response.status != 200) {
                 chatEvent.emit('send', {
@@ -169,7 +169,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
             chatEvent.emit('send', {
                 channelId,
                 type: 'chat',
-                data: `방어구 ${params[1]}성 강화시\n스탯 : ${starforce.stat}\n공격력 : ${starforce.attack}`,
+                data: `방어구 ${chatSplit[1]}성 강화시\n스탯 : ${starforce.stat}\n공격력 : ${starforce.attack}`,
                 client
             });
             break;
@@ -292,9 +292,8 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     client
                 });
             } else if (chatLength == 1) {
-                let params = chat.split(' ');
                 let response = await axios({
-                    url: `http://127.0.0.1:30003/v0/selection/maple/class/${encodeURIComponent(params[0])}`,
+                    url: `http://127.0.0.1:30003/v0/selection/maple/class/${encodeURIComponent(chatSplit[0])}`,
                     method: 'get'
                 })
                 if (response.status != 200) {
@@ -319,8 +318,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
             if (chat == "") {
                 url = `http://127.0.0.1:30003/v0/maplestory/union/${encodeURIComponent(nickname)}`
             } else if (chatLength == 1) {
-                let params = chat.split(' ');
-                url = `http://127.0.0.1:30003/v0/maplestory/union/${encodeURIComponent(params[0])}`
+                url = `http://127.0.0.1:30003/v0/maplestory/union/${encodeURIComponent(chatSplit[0])}`
             }
 
             response = await axios.get(url);
@@ -435,10 +433,65 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 //     client
                 // });
             }
+            break;
 
+        case "symbol":
+            if (chatLength != 2) {
+                break;
+            }
 
+            url = `http://127.0.0.1:30003/v0/maplestory/symbol/${chatSplit[0]}/${chatSplit[1]}`;
+            response = await axios.get(url);
+            if (response.status != 200) {
+                return;
+            }
 
+            responseData = _.get(response, "data");
+            errorMessage = _.get(responseData, 'payload.message');
+            if (errorMessage) {
+                chatEvent.emit('send', {
+                    channelId,
+                    type: 'chat',
+                    data: errorMessage,
+                    client
+                });
+                return;
+            }
 
+            let requireArcaneSymbol = _.get(responseData.payload, 'symbol.requireArcaneSymbol');
+            let journeyMeso = _.get(responseData.payload, 'symbol.journeyMeso');
+            journeyMeso = journeyMeso.toLocaleString();
+            let chuchuMeso = _.get(responseData.payload, 'symbol.chuchuMeso');
+            chuchuMeso = chuchuMeso.toLocaleString();
+            let lacheleinMeso = _.get(responseData.payload, 'symbol.lacheleinMeso');
+            lacheleinMeso = lacheleinMeso.toLocaleString();
+            let afterArcanaMeso = _.get(responseData.payload, 'symbol.afterArcanaMeso');
+            afterArcanaMeso = afterArcanaMeso.toLocaleString();
+            let requireAthenticSymbol = _.get(responseData.payload, 'symbol.requireAthenticSymbol');
+            let cerniumMeso = _.get(responseData.payload, 'symbol.cerniumMeso');
+            cerniumMeso = cerniumMeso.toLocaleString();
+            let arcusMeso = _.get(responseData.payload, 'symbol.arcusMeso');
+            arcusMeso = arcusMeso.toLocaleString();
+            let odiumMeso = _.get(responseData.payload, 'symbol.odiumMeso');
+            odiumMeso = odiumMeso.toLocaleString();
+
+            let symbolInfo = `[심볼 ${parseInt(chatSplit[0])} -> ${parseInt(chatSplit[1])} 요구치]\n`;
+            symbolInfo += `\n아케인 심볼 : ${requireArcaneSymbol}`;
+            symbolInfo += `\n여로 필요 메소 : ${journeyMeso}`;
+            symbolInfo += `\n츄츄 필요 메소 : ${chuchuMeso}`;
+            symbolInfo += `\n레헬른 필요 메소 : ${lacheleinMeso}`;
+            symbolInfo += `\n아르카나 이후 필요 메소 : ${afterArcanaMeso}`;
+            symbolInfo += `\n\n어센틱 심볼 : ${requireAthenticSymbol}`;
+            symbolInfo += `\n세르니움 필요 메소 : ${cerniumMeso}`;
+            symbolInfo += `\n아르크스 필요 메소 : ${arcusMeso}`;
+            symbolInfo += `\n오디움 필요 메소 : ${odiumMeso}`;
+
+            chatEvent.emit('send', {
+                channelId,
+                type: 'chat',
+                data: symbolInfo,
+                client
+            });
             break;
 
         default:

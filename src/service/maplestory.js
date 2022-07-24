@@ -244,7 +244,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
 
             templateId = 72506;
             templateArgs = {
-                imageUrl: `http://sonaapi.com:30003/${image.imageUrl.split("/")[0]}/${encodeURIComponent(image.imageUrl.split("/")[1])}`,
+                imageUrl: `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/${image.imageUrl.split("/")[0]}/${encodeURIComponent(image.imageUrl.split("/")[1])}`,
                 imageW: image.imageW,
                 imageH: image.imageH
             }
@@ -286,7 +286,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
         case "classSelection":
             if (chat == "") {
                 let response = await axios({
-                    url: `http://127.0.0.1:30003/v0/selection/maple/class`,
+                    url: `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/selection/maple/class`,
                     method: 'get'
                 })
                 if (response.status != 200) {
@@ -302,7 +302,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 });
             } else if (chatLength == 1) {
                 let response = await axios({
-                    url: `http://127.0.0.1:30003/v0/selection/maple/class/${encodeURIComponent(chatSplit[0])}`,
+                    url: `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/selection/maple/class/${encodeURIComponent(chatSplit[0])}`,
                     method: 'get'
                 })
                 if (response.status != 200) {
@@ -325,9 +325,9 @@ async function exec(methodObj, chat, nickname, channelId, client) {
 
         case "unionInfo":
             if (chat == "") {
-                url = `http://127.0.0.1:30003/v0/maplestory/union/${encodeURIComponent(nickname)}`
+                url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/maplestory/union/${encodeURIComponent(nickname)}`
             } else if (chatLength == 1) {
-                url = `http://127.0.0.1:30003/v0/maplestory/union/${encodeURIComponent(chatSplit[0])}`
+                url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/maplestory/union/${encodeURIComponent(chatSplit[0])}`
             }
 
             response = await axios.get(url);
@@ -366,7 +366,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
             });
             break;
         case "eventList":
-            url = `http://127.0.0.1:30003/v0/maplestory/event`
+            url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/maplestory/event`
 
             response = await axios.get(url);
             if (response.status != 200) {
@@ -449,7 +449,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 break;
             }
 
-            url = `http://127.0.0.1:30003/v0/maplestory/symbol/${chatSplit[0]}/${chatSplit[1]}`;
+            url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/maplestory/symbol/${chatSplit[0]}/${chatSplit[1]}`;
             response = await axios.get(url);
             if (response.status != 200) {
                 return;

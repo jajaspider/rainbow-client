@@ -111,10 +111,11 @@ async function exec(methodObj, chat, nickname, channelId, client) {
             break;
 
         case "crystal":
-            response = await axios.get(`${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/crystal`);
+            response = await axios.get(`http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/crystal`);
             if (response.status != 200) {
                 return;
             }
+
             responseData = _.get(response, "data");
             errorMessage = _.get(responseData, 'payload.message');
             if (errorMessage) {
@@ -189,7 +190,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
             });
             break;
         case "eventList":
-            url = `http://127.0.0.1:30003/v0/lostark/event`
+            url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/event`
 
             response = await axios.get(url);
             if (response.status != 200) {
@@ -230,7 +231,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 nextMessage = `나머지 ${eventList.length - 5}개 이벤트\n${COMPRES}`;
                 for (let i = 5; i < eventList.length; i += 1) {
                     nextMessage += `\n\n${eventList[i].title}`;
-                    nextMessage += `\nhttps://maplestory.nexon.com${eventList[i].link}`;
+                    nextMessage += `\nhttps://lostark.game.onstove.com${eventList[i].link}`;
                     nextMessage += `\n${eventList[i].date}`;
                 }
                 // 각각의 타입이 정식 지원이되면 해당하는 send는 한개로 합쳐도 상관없음

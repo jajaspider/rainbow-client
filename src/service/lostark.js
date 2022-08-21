@@ -96,7 +96,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
             // 모험물
             let collection = _.get(character, 'collection');
 
-            let info = `${nickName} - ${server} | ${job}\n`;
+            let info = `(${title})${nickName} - ${server} | ${job}\n`;
             info += `원정대 레벨 : ${expeditionLevel}\n`;
             info += `전투 레벨 : ${fightLevel}\n`;
             info += `아이템 레벨 : ${itemLevel}\n`;
@@ -117,6 +117,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
             for (let card of cardList) {
                 info += `\n${card.cardSet} | ${card.cardSetValue}`;
             }
+            info += `\n`;
 
             for (let _jewel of jewel) {
                 let _type = null;
@@ -128,6 +129,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 }
                 info += `\n${_jewel.level} | ${_type}`;
             }
+            info += `\n`;
 
             for (let _collection of collection) {
                 info += `\n${_collection.name} : ${_collection.count}`;

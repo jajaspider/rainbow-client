@@ -72,18 +72,34 @@ async function exec(methodObj, chat, nickname, channelId, client) {
             let server = _.get(character, 'server');
             let nickName = _.get(character, 'nickname');
             let job = _.get(character, 'job');
+            // 전투레벨
             let fightLevel = _.get(character, 'fightLevel');
+            // 아이템레벨
             let itemLevel = _.get(character, 'itemLevel');
+            // 공격력
             let attack = _.get(character, 'attack');
+            // 체력
             let health = _.get(character, 'health');
+            // 특성 6개의 값
             let specificList = _.get(character, 'specificList');
             let guildName = _.get(character, 'guildName');
+            // 각인 정보
             let engraveList = _.get(character, 'engraveList');
+            // 카드 정보
             let cardList = _.get(character, 'cardList');
+            // 원정대 레벨
+            let expeditionLevel = _.get(character, 'expeditionLevel');
+            // 칭호
+            let title = _.get(character, 'title');
+            // 보석
+            let jewel = _.get(character, 'jewel');
+            // 모험물
+            let collection = _.get(character, 'collection');
 
             let info = `${nickName} - ${server} | ${job}\n`;
-            info += `전투레벨 : ${fightLevel}\n`;
-            info += `아이템레벨 : ${itemLevel}\n`;
+            info += `원정대 레벨 : ${expeditionLevel}\n`;
+            info += `전투 레벨 : ${fightLevel}\n`;
+            info += `아이템 레벨 : ${itemLevel}\n`;
             info += `공격력 : ${attack}\n`;
             info += `생명력 : ${health}\n`;
             info += `길드 : ${guildName}\n\n`;
@@ -100,6 +116,21 @@ async function exec(methodObj, chat, nickname, channelId, client) {
 
             for (let card of cardList) {
                 info += `\n${card.cardSet} | ${card.cardSetValue}`;
+            }
+
+            for (let _jewel of jewel) {
+                let _type = null;
+                if (_jewel.type == 'cooldown') {
+                    _type = '홍염';
+                }
+                if (_jewel.type == 'annihilation') {
+                    _type = '멸화';
+                }
+                info += `\n${_jewel.level} | ${_type}`;
+            }
+
+            for (let _collection of collection) {
+                info += `\n${_collection.name} : ${_collection.count}`;
             }
 
             chatEvent.emit('send', {

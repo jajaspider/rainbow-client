@@ -36,13 +36,16 @@ chatEvent.on('receive', async (user) => {
     // }
 
     if (chat.includes('vs')) {
+      chat = chat.trim();
       let chatSplit = chat.split("vs");
-      chatEvent.emit('send', {
-        channelId,
-        type: 'chat',
-        data: _.sample(chatSplit).trim(),
-        client
-      });
+      if (!_.includes(chatSplit, '')) {
+        chatEvent.emit('send', {
+          channelId,
+          type: 'chat',
+          data: _.sample(chatSplit).trim(),
+          client
+        });
+      }
     }
 
     if (!_.startsWith(chat, commandPrefix)) {

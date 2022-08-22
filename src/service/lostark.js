@@ -127,7 +127,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 if (_jewel.type == 'annihilation') {
                     _type = '멸화';
                 }
-                info += `\n${_jewel.level} | ${_type}`;
+                info += `\n${_jewel.level} | ${_type} | ${_jewel.name} `;
             }
             info += `\n`;
 
@@ -194,10 +194,14 @@ async function exec(methodObj, chat, nickname, channelId, client) {
             }
             let expandList = _.get(responseData, 'payload.result');
 
-            let expandInfo = `[보유 캐릭터 정보]\n`
+            let expandInfo = `[보유 캐릭터 정보]`;
 
             for (let expand of expandList) {
-                expandInfo += `${_.get(expand, 'server')} : ${_.get(expand, 'characterList')}\n`;
+                let characterList = _.get(expand, 'characterList');
+                expandInfo += `\n\n＃${_.get(expand, 'server')}`;
+                for (let _character of characterList) {
+                    expandInfo += `\n- ${_character.name} : ${_character.itemLevel}`;
+                }
             }
 
             chatEvent.emit('send', {
@@ -222,7 +226,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
             });
             break;
         case "eventList":
-            url = `http://127.0.0.1:30003/v0/lostark/event`
+            url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/event`
 
             response = await axios.get(url);
             if (response.status != 200) {
@@ -263,7 +267,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 nextMessage = `나머지 ${eventList.length - 5}개 이벤트\n${COMPRES}`;
                 for (let i = 5; i < eventList.length; i += 1) {
                     nextMessage += `\n\n${eventList[i].title}`;
-                    nextMessage += `\nhttps://maplestory.nexon.com${eventList[i].link}`;
+                    nextMessage += `\nhttps://lostark.game.onstove.com${eventList[i].link}`;
                     nextMessage += `\n${eventList[i].date}`;
                 }
                 // 각각의 타입이 정식 지원이되면 해당하는 send는 한개로 합쳐도 상관없음
@@ -300,6 +304,102 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 // });
             }
 
+            break;
+        case "jewel":
+            if (chat == '') {
+                url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/info/${encodeURIComponent(nickname)}`;
+            } else if (chatLength == 1) {
+                url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/info/${encodeURIComponent(chat)}`;
+            }
+
+            response = await axios.get(url);
+            if (response.status != 200) {
+                return;
+            }
+            responseData = _.get(response, "data");
+            errorMessage = _.get(responseData, 'payload.message');
+            if (errorMessage) {
+                chatEvent.emit('send', {
+                    channelId,
+                    type: 'chat',
+                    data: errorMessage,
+                    client
+                });
+                return;
+            }
+
+            let jewelCharacter = _.get(responseData, 'payload.character');
+            let jewels = _.get(jewelCharacter, 'jewel');
+
+            if (_.isEmpty(jewels)) {
+                chatEvent.emit('send', {
+                    channelId,
+                    type: 'chat',
+                    data: '보석 미장착',
+                    client
+                });
+                break;
+            }
+
+            let jewelInfo = `[보석 정보]\n`
+
+            for (let _jewel of jewels) {
+                let _type = null;
+                if (_jewel.type == 'cooldown') {
+                    _type = '홍염';
+                }
+                if (_jewel.type == 'annihilation') {
+                    _type = '멸화';
+                }
+                jewelInfo += `\n${_jewel.level} | ${_type} | ${_jewel.name} `;
+            }
+
+            chatEvent.emit('send', {
+                channelId,
+                type: 'chat',
+                data: jewelInfo,
+                client
+            });
+            break;
+
+        case "collection":
+            if (chat == '') {
+                url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/info/${encodeURIComponent(nickname)}`;
+            } else if (chatLength == 1) {
+                url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/info/${encodeURIComponent(chat)}`;
+            }
+
+            response = await axios.get(url);
+            if (response.status != 200) {
+                return;
+            }
+            responseData = _.get(response, "data");
+            errorMessage = _.get(responseData, 'payload.message');
+            if (errorMessage) {
+                chatEvent.emit('send', {
+                    channelId,
+                    type: 'chat',
+                    data: errorMessage,
+                    client
+                });
+                return;
+            }
+
+            let collectionCharacter = _.get(responseData, 'payload.character');
+            let collections = _.get(collectionCharacter, 'collection');
+
+            let collectionInfo = `[수집물 정보]\n`
+
+            for (let _collection of collections) {
+                collectionInfo += `\n${_collection.name} : ${_collection.count}`;
+            }
+
+            chatEvent.emit('send', {
+                channelId,
+                type: 'chat',
+                data: collectionInfo,
+                client
+            });
             break;
 
         default:

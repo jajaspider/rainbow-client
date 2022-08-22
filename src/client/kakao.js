@@ -43,11 +43,11 @@ class KAKAOCLIENT {
 
     async kakaoLogin() {
         try {
-            this.kakaoLink = new KakaoLink('d662864eb6a3efa5a93c7cddb665b142', 'http://sonaapi.com');
+            this.kakaoLink = new KakaoLink('d662864eb6a3efa5a93c7cddb665b142', 'http://sona.zone');
             await this.kakaoLink.login('sonaapi17@gmail.com', 'maple.support');
             this.kakaoLinkDate = new Date().getDate();
         } catch (e) {
-            console.dir(e);
+            // console.dir(e);
             console.dir('로그인 실패');
         }
     }

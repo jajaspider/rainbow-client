@@ -68,8 +68,8 @@ chatEvent.on('saveImage', async (payload) => {
         }
         //이미지 확장자
         let ext = String(
-                channel["_chatListStore"]["_chatList"][i].attachment.url
-            )
+            channel["_chatListStore"]["_chatList"][i].attachment.url
+        )
             .split("/")
             .reverse()[0]
             .split(".")
@@ -89,7 +89,7 @@ chatEvent.on('saveImage', async (payload) => {
             })
             .catch((err) => {
                 //ignore
-                console.dir(err);
+                // console.dir(err);
             });
 
         let requestType = null;
@@ -114,7 +114,7 @@ chatEvent.on('saveImage', async (payload) => {
             },
         }
 
-        let response = await axios.post('http://localhost:30003/v0/images/upload', formData, requestConfig);
+        let response = await axios.post(`http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/images/upload`, formData, requestConfig);
         responseData = _.get(response, "data");
         let image = _.get(responseData, 'payload.image');
         if (responseData.isSuccess) {
@@ -173,7 +173,7 @@ chatEvent.on('deleteImage', async (payload) => {
     }
 
     //router.delete('/:type/:name'
-    let response = await axios.delete(`http://localhost:30003/v0/images/${requestType}/${encodeURIComponent(name)}`);
+    let response = await axios.delete(`http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/images/${requestType}/${encodeURIComponent(name)}`);
     let responseData = _.get(response, 'data');
 
     //success
@@ -256,10 +256,10 @@ chatEvent.on('send', async (payload) => {
                 let templateArgs = _.get(payload, 'templateArgs');
                 await kakaoClient.kakaoLink.send(
                     `${channel.info.openLink.linkName}`, {
-                        link_ver: '4.0',
-                        template_id: templateId,
-                        template_args: templateArgs
-                    }, 'custom');
+                    link_ver: '4.0',
+                    template_id: templateId,
+                    template_args: templateArgs
+                }, 'custom');
 
                 let next = _.get(payload, 'next');
                 if (next != null) {
@@ -273,7 +273,7 @@ chatEvent.on('send', async (payload) => {
             }
 
         } catch (e) {
-            console.dir(e);
+            // console.dir(e);
             setTimeout(() => {
                 chatEvent.emit('send', payload);
             }, 1000);

@@ -1,11 +1,17 @@
 const _ = require("lodash");
 const axios = require("axios");
-const Common = require("../models/index").Common;
 const async = require("async");
+const path = require('path');
+const fs = require('fs');
+const yaml = require('js-yaml');
+
+const Common = require("../models/index").Common;
 const {
   chatEvent
 } = require('../core/eventBridge');
 const COMPRES = "\u200b".repeat(500);
+let configPath = path.join(process.cwd(), 'config', 'rainbow.develop.yaml');
+let config = yaml.load(fs.readFileSync(configPath));
 
 async function exec(methodObj, chat, nickname, channelId, client) {
   let command = _.get(methodObj, "name");
@@ -15,7 +21,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
       if (chat == "") {
         let type = _.get(methodObj, "params.type");
         let result = await axios.get(
-          `http://localhost:30003/v0/${command}/${type}`
+          `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/${command}/${type}`
         );
         if (result.status != 200) {
           return {};
@@ -45,7 +51,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
         };
 
         let result = await axios.post(
-          `http://localhost:30003/v0/${command}/register`,
+          `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/${command}/register`,
           params
         );
         let data = _.get(result, "data");
@@ -73,7 +79,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
           result += `\n\n명령어 : ${method}\n대체 명령어 : ${alias}\n설명 : ${description}`;
         });
       } catch (e) {
-        console.dir(e);
+        // console.dir(e);
       }
 
       chatEvent.emit('send', {
@@ -82,10 +88,10 @@ async function exec(methodObj, chat, nickname, channelId, client) {
         data: result,
         client
       });
-      // return {
-      //   type: "sendChat",
-      //     result,
-      // };
+    // return {
+    //   type: "sendChat",
+    //     result,
+    // };
   }
 }
 

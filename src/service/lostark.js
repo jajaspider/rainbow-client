@@ -1,13 +1,20 @@
 const _ = require("lodash");
 const axios = require("axios");
-const Lostark = require("../models/index").Lostark;
+const path = require('path');
+const fs = require('fs');
+const yaml = require('js-yaml');
 const async = require("async");
+
+const Lostark = require("../models/index").Lostark;
 const {
     chatEvent
 } = require('../core/eventBridge');
 const COMPRES = "\u200b".repeat(500);
 const imageService = require('./imageService');
 const rainbowUtil = require('../utils');
+
+let configPath = path.join(process.cwd(), 'config', 'rainbow.develop.yaml');
+let config = yaml.load(fs.readFileSync(configPath));
 
 async function exec(methodObj, chat, nickname, channelId, client) {
     let command = _.get(methodObj, "name");
@@ -29,7 +36,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     result += `\n\n명령어 : ${method}\n대체 명령어 : ${alias}\n설명 : ${description}`;
                 });
             } catch (e) {
-                console.dir(e);
+                // console.dir(e);
             }
 
             chatEvent.emit('send', {
@@ -41,9 +48,9 @@ async function exec(methodObj, chat, nickname, channelId, client) {
             break;
         case 'info':
             if (chat == '') {
-                url = `http://localhost:30003/v0/lostark/info/${encodeURIComponent(nickname)}`;
+                url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/info/${encodeURIComponent(nickname)}`;
             } else if (chatLength == 1) {
-                url = `http://localhost:30003/v0/lostark/info/${encodeURIComponent(chat)}`;
+                url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/info/${encodeURIComponent(chat)}`;
             }
             response = await axios.get(url);
             if (response.status != 200) {
@@ -104,10 +111,11 @@ async function exec(methodObj, chat, nickname, channelId, client) {
             break;
 
         case "crystal":
-            response = await axios.get(`http://localhost:30003/v0/lostark/crystal`);
+            response = await axios.get(`http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/crystal`);
             if (response.status != 200) {
                 return;
             }
+
             responseData = _.get(response, "data");
             errorMessage = _.get(responseData, 'payload.message');
             if (errorMessage) {
@@ -133,9 +141,9 @@ async function exec(methodObj, chat, nickname, channelId, client) {
             break;
         case "expand":
             if (chat == '') {
-                url = `http://localhost:30003/v0/lostark/expand/${encodeURIComponent(nickname)}`;
+                url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/expand/${encodeURIComponent(nickname)}`;
             } else if (chatLength == 1) {
-                url = `http://localhost:30003/v0/lostark/expand/${encodeURIComponent(chat)}`;
+                url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/expand/${encodeURIComponent(chat)}`;
             }
             response = await axios.get(url);
             if (response.status != 200) {
@@ -182,7 +190,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
             });
             break;
         case "eventList":
-            url = `http://127.0.0.1:30003/v0/lostark/event`
+            url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/event`
 
             response = await axios.get(url);
             if (response.status != 200) {
@@ -223,7 +231,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 nextMessage = `나머지 ${eventList.length - 5}개 이벤트\n${COMPRES}`;
                 for (let i = 5; i < eventList.length; i += 1) {
                     nextMessage += `\n\n${eventList[i].title}`;
-                    nextMessage += `\nhttps://maplestory.nexon.com${eventList[i].link}`;
+                    nextMessage += `\nhttps://lostark.game.onstove.com${eventList[i].link}`;
                     nextMessage += `\n${eventList[i].date}`;
                 }
                 // 각각의 타입이 정식 지원이되면 해당하는 send는 한개로 합쳐도 상관없음

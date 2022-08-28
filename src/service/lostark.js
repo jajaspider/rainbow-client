@@ -403,6 +403,79 @@ async function exec(methodObj, chat, nickname, channelId, client) {
             });
             break;
 
+        case "distribute":
+            if (chatLength != 1) {
+                chatEvent.emit('send', {
+                    channelId,
+                    type: 'chat',
+                    data: '잘못입력하셨습니다.',
+                    client
+                });
+                return;
+            }
+
+            try {
+                chat = Number.parseInt(chat);
+            }
+            catch (e) {
+                chatEvent.emit('send', {
+                    channelId,
+                    type: 'chat',
+                    data: '잘못입력하셨습니다.',
+                    client
+                });
+                return;
+            }
+            url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/distribute/${chat}`;
+
+            response = await axios.get(url);
+            if (response.status != 200) {
+                return;
+            }
+            responseData = _.get(response, "data");
+            errorMessage = _.get(responseData, 'payload.message');
+            if (errorMessage) {
+                chatEvent.emit('send', {
+                    channelId,
+                    type: 'chat',
+                    data: errorMessage,
+                    client
+                });
+                return;
+            }
+
+            let distribute = _.get(responseData, 'payload.result');
+            // console.dir(distribute);
+            // 입력금액
+            let gold = _.get(distribute, 'gold');
+            // 수수료 제외한 금액
+            let excludeFee = _.get(distribute, 'excludeFee');
+
+            let four = _.get(distribute, '4');
+            let eight = _.get(distribute, '8');
+
+            let distributeInfo = `[입찰 계산기] ${gold}G\n`
+            distributeInfo += `\n\n＃ 4인 레이드`;
+            distributeInfo += `\n- 4인 최적 분배 : ${_.get(four, 'bidPrice')}`;
+            distributeInfo += `\n- 4인 최적 선점 : ${_.get(four, 'bestBid')}`;
+            distributeInfo += `\n- 입찰자 분배금액 : ${excludeFee - (_.get(four, 'individualGold') * 3)}`;
+            distributeInfo += `\n- 1인당 분배금액 : ${_.get(four, 'individualGold')}`;
+
+            distributeInfo += `\n\n＃ 8인 레이드`;
+            distributeInfo += `\n- 8인 최적 분배 : ${_.get(eight, 'bidPrice')}`;
+            distributeInfo += `\n- 8인 최적 선점 : ${_.get(eight, 'bestBid')}`;
+            distributeInfo += `\n- 입찰자 분배금액 : ${excludeFee - (_.get(eight, 'individualGold') * 7)}`;
+            distributeInfo += `\n- 1인당 분배금액 : ${_.get(eight, 'individualGold')}`;
+
+            chatEvent.emit('send', {
+                channelId,
+                type: 'chat',
+                data: distributeInfo,
+                client
+            });
+
+            break;
+
         default:
             break;
     }

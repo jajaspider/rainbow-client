@@ -115,6 +115,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 dojang_time: _.get(character, 'dojang.time', '-'),
                 character_seed: _.get(character, 'seed.stair', '-'),
                 seed_time: _.get(character, 'seed.time', '-'),
+                server_thumbnail: _.get(character, 'worldSrc')
             };
 
             if (client == 'kakao') {

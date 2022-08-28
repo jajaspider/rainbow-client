@@ -201,7 +201,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 let characterList = _.get(expand, 'characterList');
                 expandInfo += `\n\n＃${_.get(expand, 'server')}`;
                 for (let _character of characterList) {
-                    expandInfo += `\n- ${_character.name} : ${_character.itemLevel}`;
+                    expandInfo += `\n- ${_character.name} : ${_character.itemLevel} | ${_character.job}`;
                 }
             }
 

@@ -9,6 +9,12 @@ async function router(command, chat, channelId, attachmentId, client) {
     }).lean();
 
     if (_.isEmpty(result)) {
+        result = await Manage.find({
+            alias: command,
+        }).lean();
+    }
+
+    if (_.isEmpty(result)) {
         return;
     }
 

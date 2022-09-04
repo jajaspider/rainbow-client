@@ -18,7 +18,8 @@ let config = yaml.load(fs.readFileSync(configPath));
 
 async function exec(methodObj, chat, nickname, channelId, client) {
     let command = _.get(methodObj, "name");
-    let chatLength = chat.split(" ").length;
+    let reg = /(?:[^\s"]+|"[^"]*")+/g;
+    let chatSplit = chat.match(reg);
     let response = null;
     let responseData = null;
     let errorMessage = null;
@@ -474,6 +475,39 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 client
             });
 
+            break;
+        case "bossInfo":
+            url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/boss/lostark/${encodeURIComponent(chatSplit[0])}/${encodeURIComponent(chatSplit[1])}`;
+
+            response = await axios.get(url);
+            if (response.status != 200) {
+                return;
+            }
+            responseData = _.get(response, "data");
+            errorMessage = _.get(responseData, 'payload.message');
+            if (errorMessage) {
+                chatEvent.emit('send', {
+                    channelId,
+                    type: 'chat',
+                    data: errorMessage,
+                    client
+                });
+                return;
+            }
+
+            let bossRewards = _.get(responseData, 'payload.rewards');
+            let bossInfo = `[${_.get(bossRewards, 'name')}(${_.get(bossRewards, 'level')}) 정보]\n`
+            bossInfo += `\n${_.get(bossRewards, 'money')}골드\n`;
+            for (let _reward of _.get(bossRewards, 'rewards')) {
+                bossInfo += `\n${_reward}`;
+            }
+
+            chatEvent.emit('send', {
+                channelId,
+                type: 'chat',
+                data: bossInfo,
+                client
+            });
             break;
 
         default:

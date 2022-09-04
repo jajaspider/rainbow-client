@@ -10,6 +10,10 @@ const manageSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    alias: {
+        type: Array,
+        required: true
+    },
     params: {
         type: mongoose.Mixed,
         required: false

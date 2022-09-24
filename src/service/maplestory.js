@@ -16,7 +16,7 @@ const rainbowUtil = require('../utils');
 let configPath = path.join(process.cwd(), 'config', 'rainbow.develop.yaml');
 let config = yaml.load(fs.readFileSync(configPath));
 
-async function exec(methodObj, chat, nickname, channelId, client) {
+async function exec(methodObj, chat, nickname, channelId, client, senderInfo) {
     let command = _.get(methodObj, "name");
     let chatSplit = chat.split(" ");
     let chatLength = chatSplit.length;
@@ -40,6 +40,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     channelId,
                     type: 'chat',
                     data: data.payload.message,
+                    senderInfo,
                     client
                 });
                 return;
@@ -66,6 +67,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 channelId,
                 type: 'chat',
                 data: result,
+                senderInfo,
                 client
             });
             break;
@@ -91,6 +93,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     channelId,
                     type: 'chat',
                     data: errorMessage,
+                    senderInfo,
                     client
                 });
                 return;
@@ -145,6 +148,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     channelId,
                     type: 'chat',
                     data: "잘못입력하셨습니다.",
+                    senderInfo,
                     client
                 });
                 return;
@@ -160,6 +164,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     channelId,
                     type: 'chat',
                     data: 'api 데이터 수신 실패',
+                    senderInfo,
                     client
                 });
                 return;
@@ -171,6 +176,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     channelId,
                     type: 'chat',
                     data: errorMessage,
+                    senderInfo,
                     client
                 });
             }
@@ -180,6 +186,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 channelId,
                 type: 'chat',
                 data: `방어구 ${chatSplit[1]}성 강화시\n스탯 : ${starforce.stat}\n공격력 : ${starforce.attack}`,
+                senderInfo,
                 client
             });
             break;
@@ -203,6 +210,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     channelId,
                     type: 'chat',
                     data: responseData.payload.percent,
+                    senderInfo,
                     client
                 });
             }
@@ -214,6 +222,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     channelId,
                     type: 'chat',
                     data: '잘못입력하셨습니다.',
+                    senderInfo,
                     client
                 });
                 return;
@@ -226,6 +235,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     channelId,
                     type: 'chat',
                     data: 'api 데이터 수신 실패',
+                    senderInfo,
                     client
                 });
                 return;
@@ -237,6 +247,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     channelId,
                     type: 'chat',
                     data: errorMessage,
+                    senderInfo,
                     client
                 });
             }
@@ -280,6 +291,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 channelId,
                 type: 'chat',
                 data: emoticonList,
+                senderInfo,
                 client
             });
             break;
@@ -299,6 +311,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     channelId,
                     type: 'chat',
                     data: responseData.payload.message,
+                    senderInfo,
                     client
                 });
             } else if (chatLength == 1) {
@@ -315,6 +328,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     channelId,
                     type: 'chat',
                     data: responseData.payload.message,
+                    senderInfo,
                     client
                 });
                 // return {
@@ -343,6 +357,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     channelId,
                     type: 'chat',
                     data: errorMessage,
+                    senderInfo,
                     client
                 });
                 return;
@@ -363,6 +378,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 channelId,
                 type: 'chat',
                 data: message,
+                senderInfo,
                 client
             });
             break;
@@ -381,6 +397,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     channelId,
                     type: 'chat',
                     data: errorMessage,
+                    senderInfo,
                     client
                 });
                 return;
@@ -463,6 +480,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     channelId,
                     type: 'chat',
                     data: errorMessage,
+                    senderInfo,
                     client
                 });
                 return;
@@ -500,6 +518,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 channelId,
                 type: 'chat',
                 data: symbolInfo,
+                senderInfo,
                 client
             });
             break;

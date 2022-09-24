@@ -6,7 +6,7 @@ const {
     chatEvent
 } = require('../core/eventBridge');
 
-async function exec(methodObj, chat, channelId, attachmentId, client) {
+async function exec(methodObj, chat, channelId, attachmentId, client, senderInfo) {
     let command = _.get(methodObj, "name");
     let chatLength = chat.split(" ").length;
 
@@ -38,6 +38,7 @@ async function exec(methodObj, chat, channelId, attachmentId, client) {
                         channelId,
                         type: 'chat',
                         data: "추가 성공",
+                        senderInfo,
                         client
                     });
                     // return {
@@ -49,6 +50,7 @@ async function exec(methodObj, chat, channelId, attachmentId, client) {
                         channelId,
                         type: 'chat',
                         data: "추가 실패",
+                        senderInfo,
                         client
                     });
                     // return {
@@ -67,6 +69,7 @@ async function exec(methodObj, chat, channelId, attachmentId, client) {
                         channelId,
                         type: 'chat',
                         data: "삭제 성공",
+                        senderInfo,
                         client
                     });
                     // return {
@@ -78,6 +81,7 @@ async function exec(methodObj, chat, channelId, attachmentId, client) {
                         channelId,
                         type: 'chat',
                         data: "삭제 실패",
+                        senderInfo,
                         client
                     });
                     // return {
@@ -87,23 +91,23 @@ async function exec(methodObj, chat, channelId, attachmentId, client) {
                 }
             }
             break;
-        case 'emoticon':
-            // attachmentId
-            chatEvent.emit('saveImage', {
-                channelId,
-                chat,
-                attachmentId,
-                client
-            });
-            break;
-        case 'deleteEmoticon':
-            chatEvent.emit('deleteImage', {
-                channelId,
-                chat,
-                attachmentId,
-                client
-            });
-            break;
+        // case 'emoticon':
+        //     // attachmentId
+        //     chatEvent.emit('saveImage', {
+        //         channelId,
+        //         chat,
+        //         attachmentId,
+        //         client
+        //     });
+        //     break;
+        // case 'deleteEmoticon':
+        //     chatEvent.emit('deleteImage', {
+        //         channelId,
+        //         chat,
+        //         attachmentId,
+        //         client
+        //     });
+        //     break;
 
     }
 }

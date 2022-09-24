@@ -17,7 +17,6 @@ const imageService = require('../service/imageService');
 let configPath = path.join(process.cwd(), 'config', 'rainbow.develop.yaml');
 let config = yaml.load(fs.readFileSync(configPath));
 
-
 chatEvent.on('receive', async (user) => {
   try {
     console.dir(user);
@@ -29,6 +28,7 @@ chatEvent.on('receive', async (user) => {
     // nickname = nickname.split('/')[0].trim();
     const attachmentId = _.get(user, 'attachmentId');
     const client = _.get(user, 'client');
+    const senderInfo = _.get(user, 'senderInfo');
 
     // 오픈 카톡방이 아니므로 생략처리
     // if (_.get(sender, 'userType') != 1000) {
@@ -43,6 +43,7 @@ chatEvent.on('receive', async (user) => {
           channelId,
           type: 'chat',
           data: _.sample(chatSplit).trim(),
+          senderInfo,
           client
         });
       }
@@ -57,25 +58,25 @@ chatEvent.on('receive', async (user) => {
 
     let command = chat.replace(commandPrefix, "").split(" ")[0];
     chat = chat.replace(`${commandPrefix}${command}`, "").trim();
-    await commonRouter.router(command, chat, nickname, channelId, client);
+    await commonRouter.router(command, chat, nickname, channelId, client, senderInfo);
     // 반환되는형태는 sendChat, reply 형태
     let userId = _.get(user, 'userId');
     if (userId) {
       let isManager = await permissionRouter.router(userId);
       // 매니저 권한인것으로 확인
       if (_.includes(isManager, 'manager')) {
-        await manageRouter.router(command, chat, channelId, attachmentId, client);
+        await manageRouter.router(command, chat, channelId, attachmentId, client, senderInfo);
       }
     }
 
     let roomTypes = await permissionRouter.router(channelId);
 
     if (_.includes(roomTypes, 'maplestory')) {
-      await maplestoryRouter.router(command, chat, nickname, channelId, client);
+      await maplestoryRouter.router(command, chat, nickname, channelId, client, senderInfo);
     }
 
     if (_.includes(roomTypes, 'lostark')) {
-      await lostarkRouter.router(command, chat, nickname, channelId, client);
+      await lostarkRouter.router(command, chat, nickname, channelId, client, senderInfo);
     }
   } catch (e) {
     // console.dir(e);

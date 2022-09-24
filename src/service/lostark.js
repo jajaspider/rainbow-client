@@ -16,7 +16,7 @@ const rainbowUtil = require('../utils');
 let configPath = path.join(process.cwd(), 'config', 'rainbow.develop.yaml');
 let config = yaml.load(fs.readFileSync(configPath));
 
-async function exec(methodObj, chat, nickname, channelId, client) {
+async function exec(methodObj, chat, nickname, channelId, client, senderInfo) {
     let command = _.get(methodObj, "name");
     let chatLength = chat.split(" ").length;
     let response = null;
@@ -43,6 +43,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 channelId,
                 type: 'chat',
                 data: result,
+                senderInfo,
                 client
             });
             break;
@@ -63,6 +64,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     channelId,
                     type: 'chat',
                     data: errorMessage,
+                    senderInfo,
                     client
                 });
                 return;
@@ -139,6 +141,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 channelId,
                 type: 'chat',
                 data: info,
+                senderInfo,
                 client
             });
             break;
@@ -156,6 +159,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     channelId,
                     type: 'chat',
                     data: errorMessage,
+                    senderInfo,
                     client
                 });
                 return;
@@ -169,6 +173,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 channelId,
                 type: 'chat',
                 data: crystalInfo,
+                senderInfo,
                 client
             });
             break;
@@ -189,6 +194,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     channelId,
                     type: 'chat',
                     data: errorMessage,
+                    senderInfo,
                     client
                 });
                 return;
@@ -209,6 +215,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 channelId,
                 type: 'chat',
                 data: expandInfo,
+                senderInfo,
                 client
             });
             break;
@@ -223,6 +230,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 channelId,
                 type: 'chat',
                 data: emoticonList,
+                senderInfo,
                 client
             });
             break;
@@ -241,6 +249,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     channelId,
                     type: 'chat',
                     data: errorMessage,
+                    senderInfo,
                     client
                 });
                 return;
@@ -324,6 +333,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     channelId,
                     type: 'chat',
                     data: errorMessage,
+                    senderInfo,
                     client
                 });
                 return;
@@ -337,6 +347,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     channelId,
                     type: 'chat',
                     data: '보석 미장착',
+                    senderInfo,
                     client
                 });
                 break;
@@ -359,6 +370,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 channelId,
                 type: 'chat',
                 data: jewelInfo,
+                senderInfo,
                 client
             });
             break;
@@ -381,6 +393,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     channelId,
                     type: 'chat',
                     data: errorMessage,
+                    senderInfo,
                     client
                 });
                 return;
@@ -399,6 +412,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 channelId,
                 type: 'chat',
                 data: collectionInfo,
+                senderInfo,
                 client
             });
             break;
@@ -409,6 +423,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     channelId,
                     type: 'chat',
                     data: '잘못입력하셨습니다.',
+                    senderInfo,
                     client
                 });
                 return;
@@ -422,6 +437,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     channelId,
                     type: 'chat',
                     data: '잘못입력하셨습니다.',
+                    senderInfo,
                     client
                 });
                 return;
@@ -439,6 +455,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                     channelId,
                     type: 'chat',
                     data: errorMessage,
+                    senderInfo,
                     client
                 });
                 return;
@@ -471,6 +488,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
                 channelId,
                 type: 'chat',
                 data: distributeInfo,
+                senderInfo,
                 client
             });
 

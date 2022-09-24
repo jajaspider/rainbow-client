@@ -13,7 +13,7 @@ const COMPRES = "\u200b".repeat(500);
 let configPath = path.join(process.cwd(), 'config', 'rainbow.develop.yaml');
 let config = yaml.load(fs.readFileSync(configPath));
 
-async function exec(methodObj, chat, nickname, channelId, client) {
+async function exec(methodObj, chat, nickname, channelId, client, senderInfo) {
   let command = _.get(methodObj, "name");
   switch (command) {
     case "selection":
@@ -33,6 +33,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
           channelId,
           type: 'chat',
           data: data.payload.message,
+          senderInfo,
           client
         });
         // return {
@@ -59,6 +60,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
           channelId,
           type: 'chat',
           data: data.payload.message,
+          senderInfo,
           client
         });
         // return {
@@ -86,6 +88,7 @@ async function exec(methodObj, chat, nickname, channelId, client) {
         channelId,
         type: 'chat',
         data: result,
+        senderInfo,
         client
       });
     // return {

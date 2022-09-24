@@ -6,9 +6,11 @@
         "start": "node ./src/index.js"
     },
     "dependencies": {
+        "@remote-kakao/core": "^1.0.7",
         "amqp-connection-manager": "^4.1.1",
         "async": "^3.2.3",
         "axios": "^0.24.0",
+        "crypto": "^1.0.1",
         "discord.js": "^13.6.0",
         "form-data": "^4.0.0",
         "image-downloader": "^4.1.0",

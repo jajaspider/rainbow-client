@@ -13,88 +13,87 @@ const COMPRES = "\u200b".repeat(500);
 let configPath = path.join(process.cwd(), 'config', 'rainbow.develop.yaml');
 let config = yaml.load(fs.readFileSync(configPath));
 
-async function exec(methodObj, chat, nickname, channelId, client, senderInfo) {
+const COMMAND = {
+  SELECTION: 'selection',
+  HELP: 'help'
+}
+
+async function exec(methodObj, payload) {
+  //chat은 command부분이 제거된 상태
+  let chat = _.get(payload, 'chat');
+  const chatLength = _.split(chat, " ").length;
+  const channelId = _.get(payload, 'channelId');
+  const nickname = _.get(payload, 'nickname');
+  const client = _.get(payload, 'client');
+  const senderInfo = _.get(payload, 'senderInfo');
+
   let command = _.get(methodObj, "name");
-  switch (command) {
-    case "selection":
-      let chatLength = chat.split(" ").length;
-      if (chat == "") {
-        let type = _.get(methodObj, "params.type");
-        let result = await axios.get(
-          `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/${command}/${type}`
-        );
-        if (result.status != 200) {
-          return {};
-        }
 
-        let data = _.get(result, "data");
-        // console.dir(data);
-        chatEvent.emit('send', {
-          channelId,
-          type: 'chat',
-          data: data.payload.message,
-          senderInfo,
-          client
-        });
-        // return {
-        //   type: "sendChat",
-        //   result: data.payload.message,
-        // };
-      } else if (chatLength >= 1) {
-        let type = _.get(methodObj, "params.type");
-        if (type == "channel") {
-          return;
-        }
-        let params = {
-          name: chat,
-          type,
-          author: nickname,
-        };
-
-        let result = await axios.post(
-          `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/${command}/register`,
-          params
-        );
-        let data = _.get(result, "data");
-        chatEvent.emit('send', {
-          channelId,
-          type: 'chat',
-          data: data.payload.message,
-          senderInfo,
-          client
-        });
-        // return {
-        //   type: "sendChat",
-        //   result: data.payload.message,
-        // };
-      }
-      break;
-    case "help":
-      let commonMethods = await Common.find({}).lean();
-
-      let result = `[기본 명령어]${COMPRES}`;
-      try {
-        await async.mapLimit(commonMethods, 5, async (methods) => {
-          let method = _.get(methods, "method");
-          let alias = _.get(methods, "alias");
-          let description = _.get(methods, "description");
-          result += `\n\n명령어 : ${method}\n대체 명령어 : ${alias}\n설명 : ${description}`;
-        });
-      } catch (e) {
-        // console.dir(e);
+  if (command == COMMAND.SELECTION) {
+    if (chat == null) {
+      let type = _.get(methodObj, "params.type");
+      let result = await axios.get(
+        `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/${command}/${type}`
+      );
+      if (result.status != 200) {
+        return;
       }
 
+      // 데이터는 api서버에서 rest형태로 보내줘야함.. 잘못된 형태로 구성해놓았음
+      let data = _.get(result, "data");
       chatEvent.emit('send', {
         channelId,
         type: 'chat',
-        data: result,
+        data: data.payload.message,
         senderInfo,
         client
       });
-    // return {
-    //   type: "sendChat",
-    //     result,
-    // };
+    } else if (chat != null) {
+      let type = _.get(methodObj, "params.type");
+      if (type == "channel") {
+        return;
+      }
+      let params = {
+        name: chat,
+        type,
+        author: nickname,
+      };
+
+      let result = await axios.post(
+        `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/${command}/register`,
+        params
+      );
+      let data = _.get(result, "data");
+      chatEvent.emit('send', {
+        channelId,
+        type: 'chat',
+        data: data.payload.message,
+        senderInfo,
+        client
+      });
+    }
+  } else if (command == COMMAND.HELP) {
+    let commonMethods = await Common.find({}).lean();
+
+    let result = `[기본 명령어]${COMPRES}`;
+    try {
+      await async.mapLimit(commonMethods, 5, async (methods) => {
+        let method = _.get(methods, "method");
+        let alias = _.get(methods, "alias");
+        let description = _.get(methods, "description");
+        result += `\n\n명령어 : ${method}\n대체 명령어 : ${alias}\n설명 : ${description}`;
+      });
+    } catch (e) {
+      // console.dir(e);
+    }
+
+    chatEvent.emit('send', {
+      channelId,
+      type: 'chat',
+      data: result,
+      senderInfo,
+      client
+    });
   }
 }
 

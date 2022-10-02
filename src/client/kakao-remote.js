@@ -1,8 +1,13 @@
 const _ = require('lodash');
-const { Server, Message } = require('@remote-kakao/core');
+const {
+    Server,
+    Message
+} = require('@remote-kakao/core');
 const crypto = require("crypto");
 
-const { chatEvent } = require('../core/eventBridge/index');
+const {
+    chatEvent
+} = require('../core/eventBridge/index');
 
 const server = new Server();
 const socket = _.get(server, 'socket');
@@ -17,11 +22,6 @@ server.on('message', async (data) => {
       client: 'discord'
     }
     */
-
-    //방이름으로 전송하기때문에 channelId사용
-    // userId는 username으로 대체
-    // nickname또한 공통
-
 
     let channelId = _.get(data, 'room');
     let userId = _.get(data, 'sender.name');
@@ -58,20 +58,6 @@ server.on('message', async (data) => {
 });
 
 server.on('sendMessage', (payload) => {
-    // 데이터 전송에 필요한 객체는 payload에 포함시킨다.
-    // room - 방 이름
-    // text - 전송할 str
-    // address,port
-    /* 예상가능한 객체 구조
-    {
-        senderInfo: {
-            address: 'ip',
-            port: 'port',
-            room: '방이름'
-        },
-        message: 'temptemp';
-    }
-    */
     console.dir({
         method: 'kakao-remote, sendMessage',
         payload
@@ -88,7 +74,14 @@ server.on('sendMessage', (payload) => {
     let message = _.get(payload, 'message');
 
     const session = (0, crypto.randomUUID)();
-    const data = encodeURIComponent(JSON.stringify({ event: 'sendText', data: { room, text: message }, session }));
+    const data = encodeURIComponent(JSON.stringify({
+        event: 'sendText',
+        data: {
+            room,
+            text: message
+        },
+        session
+    }));
     socket.send(data, 0, data.length, port, address);
 });
 

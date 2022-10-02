@@ -6,6 +6,14 @@ const imageEvent = new EventEmitter();
 // const lostarkEvent = new EventEmitter();
 // const commonEvent = new EventEmitter();
 
+chatEvent.on('receive', (payload) => {
+    console.dir(payload);
+})
+
+chatEvent.on('send', (payload) => {
+    console.dir(payload);
+})
+
 module.exports = {
     chatEvent,
     imageEvent

@@ -16,9 +16,17 @@ const rainbowUtil = require('../utils');
 let configPath = path.join(process.cwd(), 'config', 'rainbow.develop.yaml');
 let config = yaml.load(fs.readFileSync(configPath));
 
-async function exec(methodObj, chat, nickname, channelId, client, senderInfo) {
+async function exec(methodObj, payload) {
+    //chat은 command부분이 제거된 상태
+    let chat = _.get(payload, 'chat');
+    const chatLength = _.split(chat, " ").length;
+    const channelId = _.get(payload, 'channelId');
+    const nickname = _.get(payload, 'nickname');
+    const client = _.get(payload, 'client');
+    const senderInfo = _.get(payload, 'senderInfo');
+
     let command = _.get(methodObj, "name");
-    let chatLength = chat.split(" ").length;
+
     let response = null;
     let responseData = null;
     let errorMessage = null;
@@ -48,7 +56,7 @@ async function exec(methodObj, chat, nickname, channelId, client, senderInfo) {
             });
             break;
         case 'info':
-            if (chat == '') {
+            if (chat == null) {
                 url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/info/${encodeURIComponent(nickname)}`;
             } else if (chatLength == 1) {
                 url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/info/${encodeURIComponent(chat)}`;
@@ -178,7 +186,7 @@ async function exec(methodObj, chat, nickname, channelId, client, senderInfo) {
             });
             break;
         case "expand":
-            if (chat == '') {
+            if (chat == null) {
                 url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/expand/${encodeURIComponent(nickname)}`;
             } else if (chatLength == 1) {
                 url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/expand/${encodeURIComponent(chat)}`;
@@ -316,7 +324,7 @@ async function exec(methodObj, chat, nickname, channelId, client, senderInfo) {
 
             break;
         case "jewel":
-            if (chat == '') {
+            if (chat == null) {
                 url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/info/${encodeURIComponent(nickname)}`;
             } else if (chatLength == 1) {
                 url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/info/${encodeURIComponent(chat)}`;
@@ -376,7 +384,7 @@ async function exec(methodObj, chat, nickname, channelId, client, senderInfo) {
             break;
 
         case "collection":
-            if (chat == '') {
+            if (chat == null) {
                 url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/info/${encodeURIComponent(nickname)}`;
             } else if (chatLength == 1) {
                 url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/lostark/info/${encodeURIComponent(chat)}`;

@@ -25,6 +25,7 @@ mongoose
 
 require('./router');
 require('./client');
+
 // chatEvent.on('send', async (payload) => {
 //     console.dir({
 //         method: 'chatEvent, send',
@@ -37,7 +38,7 @@ require('./client');
 //             channelId,
 //             type: 'chat',
 //             data: "추가 성공"
-//         }); 
+//         });
 //     */
 //     let client = _.get(payload, 'client');
 //     let channelId = _.get(payload, 'channelId');
@@ -102,7 +103,7 @@ require('./client');
 //     //             chatEvent.emit('send', payload);
 //     //         }, 1000);
 //     //     }
-//     // } else 
+//     // } else
 //     if (client == 'discord') {
 //         const discordChannel = discordClient.channels.cache.get(channelId);
 //         if (!discordChannel) {

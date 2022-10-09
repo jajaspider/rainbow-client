@@ -20,9 +20,10 @@ chatEvent.on('receive', async (payload) => {
     let commandPrefix = "!";
     let chat = _.get(payload, 'chat');
     const channelId = _.get(payload, 'channelId');
-    const nickname = _.get(payload, 'nickname');
-    // nickname = nickname.split('/')[0].trim();
-    const attachmentId = _.get(payload, 'attachmentId');
+    const userId = _.get(payload, 'userId');
+    let nickname = _.get(payload, 'nickname');
+    nickname = _.split(nickname, '/')[0].trim();
+    _.set(payload, 'nickname', nickname);
     const client = _.get(payload, 'client');
     const senderInfo = _.get(payload, 'senderInfo');
 
@@ -56,25 +57,25 @@ chatEvent.on('receive', async (payload) => {
 
     await commonRouter.router(command, payload);
     // 반환되는형태는 sendChat, reply 형태
-    let userId = _.get(user, 'userId');
+
     if (userId) {
       let isManager = await permissionRouter.router(userId);
       // 매니저 권한인것으로 확인
       if (_.includes(isManager, 'manager')) {
-        await manageRouter.router(command, chat, channelId, attachmentId, client, senderInfo);
+        await manageRouter.router(command, payload);
       }
     }
 
     let roomTypes = await permissionRouter.router(channelId);
 
     if (_.includes(roomTypes, 'maplestory')) {
-      await maplestoryRouter.router(command, chat, nickname, channelId, client, senderInfo);
+      await maplestoryRouter.router(command, payload);
     }
 
     if (_.includes(roomTypes, 'lostark')) {
-      await lostarkRouter.router(command, chat, nickname, channelId, client, senderInfo);
+      await lostarkRouter.router(command, payload);
     }
   } catch (e) {
-    // console.dir(e);
+    console.dir(e);
   }
 });

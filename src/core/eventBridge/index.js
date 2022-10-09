@@ -7,11 +7,11 @@ const imageEvent = new EventEmitter();
 // const commonEvent = new EventEmitter();
 
 chatEvent.on('receive', (payload) => {
-    console.dir(payload);
+    console.dir({ event: 'receive', payload });
 })
 
 chatEvent.on('send', (payload) => {
-    console.dir(payload);
+    console.dir({ event: 'send', payload });
 })
 
 module.exports = {

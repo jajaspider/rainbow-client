@@ -15,7 +15,7 @@ let config = yaml.load(fs.readFileSync(configPath));
 
 const COMMAND = {
   SELECTION: 'selection',
-  HELP: 'help'
+  HELP: 'help',
 }
 
 async function exec(methodObj, payload) {

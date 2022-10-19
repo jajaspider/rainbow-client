@@ -11,7 +11,7 @@ const yaml = require('js-yaml');
 const fs = require('fs');
 
 let publishQueue = [];
-let publishManager = {};
+let publishTime = new Date().getTime();
 
 const {
     chatEvent
@@ -177,44 +177,8 @@ function queueManager() {
         //큐에있는 데이터를 가져옴
         let originPayload = publishQueue.shift();
 
-        //그리고 해당 방에다가 마지막으로 publish한 시간을 체크
-        let channelId = _.get(originPayload, 'channelId');
-
-        // 만약 manager내부에 이미 퍼블리시를 한적이있다면
-        let targetPublish = _.get(publishManager, channelId);
-        if (targetPublish) {
-            //기존에 퍼블리시한 시간과 1초이상 차이나는지 확인
-            if ((new Date().getTime() - _.get(targetPublish, 'date')) >= 1000) {
-                const type = _.get(originPayload, 'type');
-                // 일반 str형태 chat
-                if (type === 'chat') {
-                    let senderInfo = _.get(originPayload, 'senderInfo');
-                    let message = _.get(originPayload, 'data');
-
-                    kakaoClient.server.emit('sendMessage', {
-                        senderInfo,
-                        message
-                    });
-                }
-                else if (type === 'kakaolink') {
-                    kakaoClient.server.emit('sendKakaolink', {
-                        originPayload
-                    })
-                }
-
-                //마지막으로 publish한 시간 기록
-                _.set(publishManager, channelId, {
-                    date: new Date().getTime()
-                });
-            }
-            // 차이가 안난다면
-            else {
-                publishQueue.push(originPayload);
-            }
-        }
-        // 만약 manager내부에 이미 퍼블리시를 한적이없으면 
-        else {
-            // 무조건 전송명령을 내리고
+        //기존에 퍼블리시한 시간과 1초이상 차이나는지 확인
+        if ((new Date().getTime() - publishTime) >= 1000) {
             const type = _.get(originPayload, 'type');
             // 일반 str형태 chat
             if (type === 'chat') {
@@ -233,9 +197,14 @@ function queueManager() {
             }
 
             //마지막으로 publish한 시간 기록
-            _.set(publishManager, channelId, {
-                date: new Date().getTime()
-            });
+            // _.set(publishManager, channelId, {
+            //     date: new Date().getTime()
+            // });
+            publishTime = new Date().getTime();
+        }
+        // 차이가 안난다면
+        else {
+            publishQueue.push(originPayload);
         }
     }
 

@@ -8,6 +8,8 @@ const {
     chatEvent
 } = require('../eventBridge');
 
+const util = require('../../utils');
+
 class RabbitMQ {
     constructor() {
         this.configPath = path.join(process.cwd(), 'config', 'rainbow.develop.yaml');
@@ -20,17 +22,17 @@ class RabbitMQ {
             setup: (channel) => {
                 // `channel` here is a regular amqplib `ConfirmChannel`.
                 return Promise.all([
-                        channel.assertQueue('kakao', {
-                            durable: true
-                        }),
-                        channel.assertExchange('rainbow', 'topic'),
-                        channel.prefetch(1),
-                        channel.assertQueue('notice.maplestory', {
-                            durable: true
-                        }),
-                        channel.bindQueue('notice.maplestory', 'rainbow', 'notice'),
-                        channel.consume('notice.maplestory', mapleNoticeMessage)
-                    ],
+                    channel.assertQueue('kakao', {
+                        durable: true
+                    }),
+                    channel.assertExchange('rainbow', 'topic'),
+                    channel.prefetch(1),
+                    channel.assertQueue('notice.maplestory', {
+                        durable: true
+                    }),
+                    channel.bindQueue('notice.maplestory', 'rainbow', 'notice'),
+                    channel.consume('notice.maplestory', mapleNoticeMessage)
+                ],
                     [
                         channel.assertQueue('kakao', {
                             durable: true
@@ -88,7 +90,10 @@ const mapleNoticeMessage = async (data) => {
         let result = null;
         result = await Permission.find({
             type: 'maplestory',
-        }).lean();
+            notice: true
+        });
+        result = util.toJson(result);
+
         let maplestoryRooms = _.map(result, (resultObj) => {
             return resultObj.id;
         });
@@ -105,13 +110,13 @@ const mapleNoticeMessage = async (data) => {
                 channelId: maplestoryRoom,
                 type: 'chat',
                 data,
-                client:'kakao'
+                client: 'kakao-remote'
             });
             chatEvent.emit('send', {
                 channelId: maplestoryRoom,
                 type: 'chat',
                 data,
-                client:'discord'
+                client: 'discord'
             });
         }
 
@@ -131,7 +136,10 @@ const loaNoticeMessage = async (data) => {
         let result = null;
         result = await Permission.find({
             type: 'lostark',
-        }).lean();
+            notice: true
+        });
+        result = util.toJson(result);
+
         let lostarkRooms = _.map(result, (resultObj) => {
             return resultObj.id;
         });
@@ -147,13 +155,13 @@ const loaNoticeMessage = async (data) => {
                 channelId: lostarkRoom,
                 type: 'chat',
                 data,
-                client:'kakao'
+                client: 'kakao-remote'
             });
             chatEvent.emit('send', {
                 channelId: lostarkRoom,
                 type: 'chat',
                 data,
-                client:'discord'
+                client: 'discord'
             });
         }
 

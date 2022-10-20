@@ -3,7 +3,7 @@ const yaml = require('js-yaml');
 const fs = require('fs');
 const _ = require('lodash');
 const path = require('path');
-const Permission = require("../../models/index").Permission;
+const Room = require("../../models/index").Room;
 const {
     chatEvent
 } = require('../eventBridge');
@@ -88,7 +88,7 @@ const mapleNoticeMessage = async (data) => {
         // console.dir(message);
 
         let result = null;
-        result = await Permission.find({
+        result = await Room.find({
             type: 'maplestory',
             notice: true
         });
@@ -134,7 +134,7 @@ const loaNoticeMessage = async (data) => {
         // console.dir(message);
 
         let result = null;
-        result = await Permission.find({
+        result = await Room.find({
             type: 'lostark',
             notice: true
         });

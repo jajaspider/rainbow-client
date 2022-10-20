@@ -186,13 +186,6 @@ function queueManager() {
             // 일반 str형태 chat
             if (type === 'chat') {
                 let senderInfo = _.get(originPayload, 'senderInfo');
-                if (!senderInfo) {
-                    senderInfo = {
-                        address: '192.168.1.152',
-                        port: 43044,
-                        room: channelId
-                    }
-                }
                 let message = _.get(originPayload, 'data');
 
                 kakaoClient.server.emit('sendMessage', {
@@ -220,7 +213,7 @@ function queueManager() {
 
     setTimeout(() => {
         queueManager();
-    }, 100);
+    }, 300);
 }
 
 queueManager();

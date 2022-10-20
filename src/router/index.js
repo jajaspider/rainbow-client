@@ -3,6 +3,7 @@ const path = require('path');
 const yaml = require('js-yaml');
 const fs = require('fs');
 
+const roomRotuer = require("./room");
 const commonRouter = require("./common");
 const permissionRouter = require("./permission");
 const manageRouter = require("./manage");
@@ -66,7 +67,7 @@ chatEvent.on('receive', async (payload) => {
       }
     }
 
-    let roomTypes = await permissionRouter.router(channelId);
+    let roomTypes = await roomRotuer.router(channelId);
 
     if (_.includes(roomTypes, 'maplestory')) {
       await maplestoryRouter.router(command, payload);

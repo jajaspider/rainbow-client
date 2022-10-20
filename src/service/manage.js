@@ -1,5 +1,5 @@
 const _ = require("lodash");
-const Permission = require("../models/index").Permission;
+const Room = require("../models/index").Room;
 const {
     chatEvent
 } = require('../core/eventBridge');
@@ -41,7 +41,7 @@ async function exec(methodObj, payload) {
             type = 'lostark';
         }
 
-        let result = await Permission.find({
+        let result = await Room.find({
             id: channelId,
             type
         }).lean();
@@ -49,7 +49,7 @@ async function exec(methodObj, payload) {
         //없다면 추가
         if (_.isEmpty(result)) {
             try {
-                await Permission.insertMany({
+                await Room.insertMany({
                     id: channelId,
                     type,
                     notice: false
@@ -76,7 +76,7 @@ async function exec(methodObj, payload) {
         //있다면 삭제
         else {
             try {
-                await Permission.remove({
+                await Room.remove({
                     id: channelId,
                     type
                 });
@@ -112,14 +112,23 @@ async function exec(methodObj, payload) {
             return;
         }
 
-        let result = await Permission.find({
+        let type = null;
+        if (chat == '메이플' || chat == '메이플스토리') {
+            type = 'maplestory';
+        } else if (chat == '로아' || chat == '로스트아크') {
+            type = 'lostark';
+        }
+
+        let result = await Room.find({
             id: channelId,
             type
         });
         result = util.toJson(result);
 
+        let alarmStatus = _.get(result, 'notice');
+
         try {
-            await Permission.updateOne({
+            await Room.updateOne({
                 id: channelId,
                 type
             }, {
@@ -151,7 +160,7 @@ async function exec(methodObj, payload) {
     }
     //debug
     else if (command == COMMAND.ROOM_INFO) {
-        let result = await Permission.find({
+        let result = await Room.find({
             id: channelId
         });
         result = util.toJson(result);

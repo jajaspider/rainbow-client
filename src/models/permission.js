@@ -9,11 +9,7 @@ const permissionSchema = new mongoose.Schema({
     type: {
         type: String,
         required: true
-    },
-    notice: {
-        type: Boolean,
-        default: false
-    },
+    }
 }, {
     timestamps: true
 });

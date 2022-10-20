@@ -10,6 +10,10 @@ const permissionSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    notice: {
+        type: Boolean,
+        default: false
+    },
 }, {
     timestamps: true
 });

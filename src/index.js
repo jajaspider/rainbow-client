@@ -25,6 +25,7 @@ mongoose
 
 require('./router');
 require('./client');
+require('./core/rabbitmq');
 
 // chatEvent.on('send', async (payload) => {
 //     console.dir({

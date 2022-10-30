@@ -177,6 +177,9 @@ function queueManager() {
         //큐에있는 데이터를 가져옴
         let originPayload = publishQueue.shift();
 
+        //그리고 해당 방에다가 마지막으로 publish한 시간을 체크
+        let channelId = _.get(originPayload, 'channelId');
+
         //기존에 퍼블리시한 시간과 1초이상 차이나는지 확인
         if ((new Date().getTime() - publishTime) >= 1000) {
             const type = _.get(originPayload, 'type');
@@ -210,7 +213,7 @@ function queueManager() {
 
     setTimeout(() => {
         queueManager();
-    }, 100);
+    }, 300);
 }
 
 queueManager();

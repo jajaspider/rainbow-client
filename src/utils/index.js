@@ -4,6 +4,11 @@ function sleep(time) {
     });
 }
 
+function toJson(data) {
+    return JSON.parse(JSON.stringify(data));
+}
+
 module.exports = {
-    sleep: sleep
+    sleep: sleep,
+    toJson
 };

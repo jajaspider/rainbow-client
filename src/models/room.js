@@ -2,13 +2,17 @@ const mongoose = require('mongoose');
 
 // Define Schemes
 const roomSchema = new mongoose.Schema({
-    number: {
+    id: {
         type: String,
         required: true
     },
     type: {
         type: String,
         required: true
+    },
+    notice: {
+        type: Boolean,
+        default: false
     },
 }, {
     timestamps: true

@@ -123,7 +123,7 @@ const mapleNoticeMessage = async (data) => {
         rabbitMQ.channelWrapper.ack(data);
         // channelWrapper.ack(data);
     } catch (e) {
-
+        console.dir(e);
     }
 
 }
@@ -168,7 +168,7 @@ const loaNoticeMessage = async (data) => {
         rabbitMQ.channelWrapper.ack(data);
         // channelWrapper.ack(data);
     } catch (e) {
-
+        console.dir(e);
     }
 }
 

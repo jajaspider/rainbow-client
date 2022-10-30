@@ -14,6 +14,12 @@ rabbitmq:
   port: 5672
   exchange: rainbow
 
+kakaoLink:
+  javascriptKey: ''
+  domain: ''
+  email: ''
+  password: ''
+
 discord:
   token: "your-token"
 

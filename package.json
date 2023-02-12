@@ -1,25 +1,25 @@
 {
-    "name": "rainbow-kakao",
-    "version": "1.0.0",
-    "private": true,
-    "scripts": {
-        "start": "node ./src/index.js"
-    },
-    "dependencies": {
-        "@remote-kakao/core": "^1.0.7",
-        "@remote-kakao/kakaolink-plugin": "^1.0.8",
-        "amqp-connection-manager": "^4.1.1",
-        "async": "^3.2.3",
-        "axios": "^0.24.0",
-        "crypto": "^1.0.1",
-        "discord.js": "^13.6.0",
-        "form-data": "^4.0.0",
-        "image-downloader": "^4.1.0",
-        "js-yaml": "^4.1.0",
-        "kakao-link": "^2.0.1",
-        "lodash": "^4.17.21",
-        "mongoose": "^6.1.6",
-        "node-kakao": "^4.5.0",
-        "uuid": "^8.3.2"
-    }
+  "name": "rainbow-kakao",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./src/index.js"
+  },
+  "dependencies": {
+    "@remote-kakao/core": "^1.0.7",
+    "@remote-kakao/kakaolink-plugin": "^1.0.8",
+    "amqp-connection-manager": "^4.1.1",
+    "async": "^3.2.3",
+    "axios": "^0.24.0",
+    "crypto": "^1.0.1",
+    "discord.js": "^13.6.0",
+    "form-data": "^4.0.0",
+    "image-downloader": "^4.1.0",
+    "js-yaml": "^4.1.0",
+    "kakao-link": "^2.0.1",
+    "lodash": "^4.17.21",
+    "mongoose": "^6.1.6",
+    "node-kakao": "^4.5.0",
+    "uuid": "^8.3.2"
+  }
 }

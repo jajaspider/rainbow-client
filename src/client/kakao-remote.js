@@ -10,7 +10,7 @@ const fs = require("fs");
 let publishQueue = [];
 let publishTime = new Date().getTime();
 
-const { chatEvent } = require("../core/eventBridge/index");
+const { chatEvent, imageEvent } = require("../core/eventBridge/index");
 
 let configPath = path.join(process.cwd(), "config", "rainbow.develop.yaml");
 let config = yaml.load(fs.readFileSync(configPath));
@@ -64,6 +64,7 @@ class KAKAOCLIENT {
       };
 
       chatEvent.emit("receive", user);
+      imageEvent.emit("receive", user);
     });
 
     this.server.on("sendMessage", (payload) => {
@@ -108,7 +109,6 @@ class KAKAOCLIENT {
       let address = _.get(senderInfo, "address");
       let port = _.get(senderInfo, "port");
       let room = _.get(senderInfo, "room");
-      console.dir(payload.originPayload.data);
 
       const session = (0, crypto.randomUUID)();
       const data = encodeURIComponent(

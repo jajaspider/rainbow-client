@@ -26,6 +26,7 @@ const COMMAND = {
   UNION: "unionInfo",
   EVENT_LIST: "eventList",
   SYMBOL: "symbol",
+  DAILY_QUEST: "dailyQuest",
 };
 
 async function exec(methodObj, payload) {
@@ -663,6 +664,116 @@ async function exec(methodObj, payload) {
       client,
     });
     return;
+  } else if (command == COMMAND.DAILY_QUEST) {
+    let url = `http://${_.get(config, "site.domain")}:${_.get(
+      config,
+      "site.port"
+    )}/api/v0/maplestory/exp/quest`;
+
+    let level = chatSplit[0];
+    try {
+      level = parseInt(level);
+    } catch (e) {
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: "레벨을 잘못 입력하셨습니다.",
+        senderInfo,
+        client,
+      });
+      return;
+    }
+    let region = chatSplit[1];
+
+    if (region == "여로" || region == "소멸의여로") {
+      region = "VanishingJourney";
+    } else if (region == "츄츄" || region == "츄츄아일랜드") {
+      region = "ChuChu";
+    } else if (region == "레헬른") {
+      region = "Lachelein";
+    } else if (region == "아르카나" || region == "알카") {
+      region = "Arcana";
+    } else if (region == "모라스") {
+      region = "Morass";
+    } else if (region == "에스페라" || region == "에페") {
+      region = "Esfera";
+    } else if (region == "문브릿지" || region == "문브") {
+      region = "Moonbridge";
+    } else if (region == "고통의미궁" || region == "미궁") {
+      region = "Labyrinth";
+    } else if (region == "리멘") {
+      region = "Limina";
+    } else if (
+      region == "세르니움" ||
+      region == "전르" ||
+      region == "전르니움"
+    ) {
+      region = "Cernium";
+    } else if (
+      region == "불타는세르니움" ||
+      region == "후르" ||
+      region == "후르니움"
+    ) {
+      region = "BurningCernium";
+    } else if (
+      region == "호텔아르크스" ||
+      region == "호텔" ||
+      region == "아르크스"
+    ) {
+      region = "HotelArcus";
+    } else if (region == "오디움" || region == "눈을뜬실험실오디움") {
+      region = "Odium";
+    } else {
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: "지원하지않는 지역입니다.",
+        senderInfo,
+        client,
+      });
+      return;
+    }
+    let subCount = chatSplit[2] || 0;
+    try {
+      subCount = parseInt(subCount);
+    } catch (e) {
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: "서브 퀘스트 횟수를 잘못 입력하셨습니다.",
+        senderInfo,
+        client,
+      });
+      return;
+    }
+    let requestBody = {
+      level: chatSplit[0],
+      region,
+      subCount,
+    };
+
+    try {
+      let response = await axios.post(url, requestBody);
+      let responseData = _.get(response, "data");
+      console.dir(responseData);
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: `${level}에서 일일퀘스트 완료 시 ${responseData}% 상승`,
+        senderInfo,
+        client,
+      });
+      return;
+    } catch (e) {
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: e.response.data,
+        senderInfo,
+        client,
+      });
+      return;
+    }
   }
 }
 

@@ -27,6 +27,7 @@ const COMMAND = {
   EVENT_LIST: "eventList",
   SYMBOL: "symbol",
   DAILY_QUEST: "dailyQuest",
+  MONSTER_PARK: "monsterPark",
 };
 
 async function exec(methodObj, payload) {
@@ -755,11 +756,55 @@ async function exec(methodObj, payload) {
     try {
       let response = await axios.post(url, requestBody);
       let responseData = _.get(response, "data");
-      console.dir(responseData);
       chatEvent.emit("send", {
         channelId,
         type: "chat",
         data: `${level}에서 일일퀘스트 완료 시 ${responseData}% 상승`,
+        senderInfo,
+        client,
+      });
+      return;
+    } catch (e) {
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: e.response.data,
+        senderInfo,
+        client,
+      });
+      return;
+    }
+  } else if (command == COMMAND.MONSTER_PARK) {
+    let url = `http://${_.get(config, "site.domain")}:${_.get(
+      config,
+      "site.port"
+    )}/api/v0/maplestory/exp/monsterpark`;
+
+    let level = chatSplit[0];
+    try {
+      level = parseInt(level);
+    } catch (e) {
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: "레벨을 잘못 입력하셨습니다.",
+        senderInfo,
+        client,
+      });
+      return;
+    }
+
+    let requestBody = {
+      level: chatSplit[0],
+    };
+
+    try {
+      let response = await axios.post(url, requestBody);
+      let responseData = _.get(response, "data");
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: `${level}에서 몬스터파크 완료 시 ${responseData}% 상승`,
         senderInfo,
         client,
       });

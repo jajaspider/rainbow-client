@@ -33,6 +33,7 @@ class KAKAOCLIENT {
               client: 'discord'
             }
             */
+      console.dir(data);
 
       let channelId = _.get(data, "room");
       let userId = _.get(data, "sender.name");

@@ -26,6 +26,8 @@ const COMMAND = {
   UNION: "unionInfo",
   EVENT_LIST: "eventList",
   SYMBOL: "symbol",
+  DAILY_QUEST: "dailyQuest",
+  MONSTER_PARK: "monsterPark",
 };
 
 async function exec(methodObj, payload) {
@@ -149,50 +151,43 @@ async function exec(methodObj, payload) {
       });
       return;
     }
-
     //정보 명령어용 템플릿
-    let templateId = 84019;
     let character = _.get(responseData, "payload.character");
 
-    let templateArgs = {
-      character_name: _.get(character, "name"),
-      character_level: _.get(character, "level"),
-      character_class: _.get(character, "class"),
-      character_exp: _.get(character, "exp"),
-      character_pop: _.get(character, "pop"),
-      character_ranking1: _.get(character, "ranking.current"),
-      character_ranking2: _.get(character, "ranking.change"),
-      character_guild: _.get(character, "guild"),
+    let nickName = _.get(character, "name");
+    // let server = server;
+    let job = _.get(character, "class");
+    let level =  _.get(character, "level");
+    let exp  = _.get(character, "exp");
+    let pop = _.get(character, "pop");
+    let currentRanking = _.get(character, "ranking.current");
+    let changeRanking = _.get(character, "ranking.change");
+    let guild = _.get(character, "guild");
+    let dojangStair  = _.get(character, "dojang.stair", "-");
+    let dojangTime = _.get(character, "dojang.time", "-");
+    let seedStair = _.get(character, "seed.stair", "-");
+    let seedTime = _.get(character, "seed.time", "-");
+
+    /*
       character_thumbnail: _.get(character, "img"),
       // server_thumbnail: _.pick(character, 'img'),
-      character_dojang: _.get(character, "dojang.stair", "-"),
-      dojang_time: _.get(character, "dojang.time", "-"),
-      character_seed: _.get(character, "seed.stair", "-"),
-      seed_time: _.get(character, "seed.time", "-"),
       server_thumbnail: _.get(character, "worldSrc"),
-    };
+      */
 
-    if (client == "kakao-remote") {
+    let info = `${nickName}(${pop}) | ${job}\n`;
+      info += `${level} - ${exp}\n`;
+      info += `길드 : ${guild}\n`;
+      info += `랭킹 : ${currentRanking}(${changeRanking})\n\n`;
+      info += `무릉도장 : ${dojangStair}층(${dojangTime})\n`;
+      info += `더시드 : ${seedStair}층(${seedTime})\n`;
+
       chatEvent.emit("send", {
         channelId,
-        type: "kakaolink",
+        type: "chat",
+        data: info,
         senderInfo,
-        data: {
-          templateId,
-          templateArgs,
-        },
         client,
       });
-    } else if (client == "discord") {
-      chatEvent.emit("send", {
-        channelId,
-        type: "embed",
-        subType: "maplestoryInfo",
-        data: character,
-        client,
-      });
-    }
-    //카카오링크 추가
   }
   // !스타포스
   else if (command == COMMAND.STARFORCE) {
@@ -479,14 +474,7 @@ async function exec(methodObj, payload) {
   }
   // !이벤트
   else if (command == COMMAND.EVENT_LIST) {
-    chatEvent.emit("send", {
-      channelId,
-      type: "chat",
-      data: "미지원",
-      senderInfo,
-      client,
-    });
-    return;
+    let maplestoryEndpoint = "https://maplestory.nexon.com"
 
     let url = `http://${_.get(config, "site.domain")}:${_.get(
       config,
@@ -520,62 +508,23 @@ async function exec(methodObj, payload) {
 
     let eventList = _.get(responseData, "payload.events");
 
-    let templateArgs = {};
-    for (
-      let i = 0;
-      i < (eventList.length <= 5 ? eventList.length : 5);
-      i += 1
-    ) {
-      templateArgs[`event_name_${i + 1}`] = eventList[i].title;
-      templateArgs[`event_contents_${i + 1}`] = eventList[i].date;
-      templateArgs[`event_image_${i + 1}`] = eventList[i].img_path;
-      templateArgs[`url${i + 1}`] = eventList[i].link;
+    let eventInfo = "[메이플스토리 이벤트]";
+
+    for(let _event of eventList){
+      eventInfo+=`\n${_event.title}\n`;
+      eventInfo+=`기간 : ${_event.date}\n`;
+      eventInfo+=`${maplestoryEndpoint}${_event.link}\n`;
     }
 
-    let templateId = 54716;
-
-    let nextMessage = null;
-    if (eventList.length > 5) {
-      await rainbowUtil.sleep(1000);
-      nextMessage = `나머지 ${eventList.length - 5}개 이벤트\n${COMPRES}`;
-      for (let i = 5; i < eventList.length; i += 1) {
-        nextMessage += `\n\n${eventList[i].title}`;
-        nextMessage += `\nhttps://maplestory.nexon.com${eventList[i].link}`;
-        nextMessage += `\n${eventList[i].date}`;
-      }
-      // 각각의 타입이 정식 지원이되면 해당하는 send는 한개로 합쳐도 상관없음
-      // if (client == 'kakao') {
-      //     chatEvent.emit('send', {
-      //         channelId,
-      //         type: 'chat',
-      //         data: message,
-      //         client
-      //     });
-      // } else if (client == 'discord') {
-      //     // 현재는 skip
-      // }
-    }
-
-    if (client == "kakao") {
-      chatEvent.emit("send", {
+     chatEvent.emit("send", {
         channelId,
-        type: "kakaolink",
-        data: {
-          templateId,
-          templateArgs,
-          next: nextMessage,
-        },
+        type: "chat",
+        data: eventInfo,
+        senderInfo,
         client,
       });
-    } else if (client == "discord") {
-      // chatEvent.emit('send', {
-      //     channelId,
-      //     type: 'embed',
-      //     subType: 'maplestoryInfo',
-      //     data: character,
-      //     client
-      // });
-    }
+      return;
+
   }
   // !심볼
   else if (command == COMMAND.SYMBOL) {
@@ -663,6 +612,215 @@ async function exec(methodObj, payload) {
       client,
     });
     return;
+  } else if (command == COMMAND.DAILY_QUEST) {
+    let level = chatSplit[0];
+    try {
+      level = parseInt(level);
+    } catch (e) {
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: "레벨을 잘못 입력하셨습니다.",
+        senderInfo,
+        client,
+      });
+      return;
+    }
+    let regionOrContinent = chatSplit[1];
+    let region = null;
+    let continent = null;
+
+    // 여로
+    if (regionOrContinent == "여로" || regionOrContinent == "소멸의여로") {
+      region = "VanishingJourney";
+    }
+    // 츄츄
+    else if (
+      regionOrContinent == "츄츄" ||
+      regionOrContinent == "츄츄아일랜드"
+    ) {
+      region = "ChuChu";
+    }
+    // 레헬른
+    else if (regionOrContinent == "레헬른") {
+      region = "Lachelein";
+    }
+    // 아르카나
+    else if (regionOrContinent == "아르카나" || regionOrContinent == "알카") {
+      region = "Arcana";
+    }
+    // 모라스
+    else if (regionOrContinent == "모라스") {
+      region = "Morass";
+    }
+    // 에스페라
+    else if (regionOrContinent == "에스페라" || regionOrContinent == "에페") {
+      region = "Esfera";
+    }
+    // 문브릿지
+    else if (regionOrContinent == "문브릿지" || regionOrContinent == "문브") {
+      region = "Moonbridge";
+    }
+    // 미궁
+    else if (regionOrContinent == "고통의미궁" || regionOrContinent == "미궁") {
+      region = "Labyrinth";
+    }
+    // 리멘
+    else if (regionOrContinent == "리멘") {
+      region = "Limina";
+    }
+    // 세르니움
+    else if (
+      regionOrContinent == "세르니움" ||
+      regionOrContinent == "전르" ||
+      regionOrContinent == "전르니움"
+    ) {
+      region = "Cernium";
+    }
+    // 불타는세르니움
+    else if (
+      regionOrContinent == "불타는세르니움" ||
+      regionOrContinent == "후르" ||
+      regionOrContinent == "후르니움"
+    ) {
+      region = "BurningCernium";
+    }
+    // 호텔아르크스
+    else if (
+      regionOrContinent == "호텔아르크스" ||
+      regionOrContinent == "호텔" ||
+      regionOrContinent == "아르크스"
+    ) {
+      region = "HotelArcus";
+    }
+    // 오디움
+    else if (
+      regionOrContinent == "오디움" ||
+      regionOrContinent == "눈을뜬실험실오디움"
+    ) {
+      region = "Odium";
+    }
+    // 아케인리버
+    else if (
+      regionOrContinent == "아케인리버" ||
+      regionOrContinent == "아케인"
+    ) {
+      continent = "ArcaneRiver";
+    }
+    // 테네브리스
+    else if (regionOrContinent == "테네브리스" || regionOrContinent == "테네") {
+      continent = "Tenebris";
+    }
+    // 그란디스
+    else if (regionOrContinent == "그란디스") {
+      continent = "Grandis";
+    }
+    // 미입력
+    else if (_.isEmpty(regionOrContinent)) {
+    }
+    // 뭔가 입력
+    else {
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: "지원하지않는 지역입니다.",
+        senderInfo,
+        client,
+      });
+      return;
+    }
+    let subCount = chatSplit[2] || 0;
+    try {
+      subCount = parseInt(subCount);
+    } catch (e) {
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: "서브 퀘스트 횟수를 잘못 입력하셨습니다.",
+        senderInfo,
+        client,
+      });
+      return;
+    }
+
+    let url = `http://${_.get(config, "site.domain")}:${_.get(
+      config,
+      "site.port"
+    )}/api/v0/maplestory/exp/quest`;
+
+    let requestBody = {
+      level: chatSplit[0],
+      region,
+      continent,
+      subCount,
+    };
+
+    try {
+      let response = await axios.post(url, requestBody);
+      let responseData = _.get(response, "data");
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: `${level}에서 일일퀘스트 완료 시 ${responseData}% 상승`,
+        senderInfo,
+        client,
+      });
+      return;
+    } catch (e) {
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: e.response.data,
+        senderInfo,
+        client,
+      });
+      return;
+    }
+  } else if (command == COMMAND.MONSTER_PARK) {
+    let url = `http://${_.get(config, "site.domain")}:${_.get(
+      config,
+      "site.port"
+    )}/api/v0/maplestory/exp/monsterpark`;
+
+    let level = chatSplit[0];
+    try {
+      level = parseInt(level);
+    } catch (e) {
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: "레벨을 잘못 입력하셨습니다.",
+        senderInfo,
+        client,
+      });
+      return;
+    }
+
+    let requestBody = {
+      level: chatSplit[0],
+    };
+
+    try {
+      let response = await axios.post(url, requestBody);
+      let responseData = _.get(response, "data");
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: `${level}에서 몬스터파크 완료 시 ${responseData}% 상승`,
+        senderInfo,
+        client,
+      });
+      return;
+    } catch (e) {
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: e.response.data,
+        senderInfo,
+        client,
+      });
+      return;
+    }
   }
 }
 

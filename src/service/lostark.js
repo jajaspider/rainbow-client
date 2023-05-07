@@ -290,63 +290,21 @@ async function exec(methodObj, payload) {
       }
       let eventList = _.get(responseData, "payload.events");
 
-      templateArgs = {};
-      for (
-        let i = 0;
-        i < (eventList.length <= 5 ? eventList.length : 5);
-        i += 1
-      ) {
-        templateArgs[`event_name_${i + 1}`] = eventList[i].title;
-        let term = eventList[i].term.replace("이벤트 기간 : ", "");
-        templateArgs[`event_contents_${i + 1}`] = term;
-        templateArgs[`event_image_${i + 1}`] = eventList[i].img_path;
-        templateArgs[`url${i + 1}`] = eventList[i].link;
-      }
+      let maplestoryEndpoint = "https://lostark.game.onstove.com/"
+      let eventInfo = "[로스트아크 이벤트]";
+      for(let _event of eventList){
+      eventInfo+=`\n${_event.title}\n`;
+      eventInfo+=`${_event.term}\n`;
+      eventInfo+=`${maplestoryEndpoint}${_event.link}\n`;
+    }
 
-      templateId = 78643;
-
-      let nextMessage = null;
-      if (eventList.length > 5) {
-        await rainbowUtil.sleep(1000);
-        nextMessage = `나머지 ${eventList.length - 5}개 이벤트\n${COMPRES}`;
-        for (let i = 5; i < eventList.length; i += 1) {
-          nextMessage += `\n\n${eventList[i].title}`;
-          nextMessage += `\nhttps://lostark.game.onstove.com${eventList[i].link}`;
-          nextMessage += `\n${eventList[i].date}`;
-        }
-        // 각각의 타입이 정식 지원이되면 해당하는 send는 한개로 합쳐도 상관없음
-        // if (client == 'kakao') {
-        //     chatEvent.emit('send', {
-        //         channelId,
-        //         type: 'chat',
-        //         data: message,
-        //         client
-        //     });
-        // } else if (client == 'discord') {
-        //     // 현재는 skip
-        // }
-      }
-
-      if (client == "kakao") {
-        chatEvent.emit("send", {
-          channelId,
-          type: "kakaolink",
-          data: {
-            templateId,
-            templateArgs,
-            next: nextMessage,
-          },
-          client,
-        });
-      } else if (client == "discord") {
-        // chatEvent.emit('send', {
-        //     channelId,
-        //     type: 'embed',
-        //     subType: 'maplestoryInfo',
-        //     data: character,
-        //     client
-        // });
-      }
+     chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: eventInfo,
+        senderInfo,
+        client,
+      });
 
       break;
     case "jewel":

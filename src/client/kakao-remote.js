@@ -7,6 +7,8 @@ const path = require("path");
 const yaml = require("js-yaml");
 const fs = require("fs");
 
+const DeviceDB = require("../models").Device;
+
 let publishQueue = [];
 let publishTime = new Date().getTime();
 
@@ -43,6 +45,14 @@ class KAKAOCLIENT {
         room: _.get(data, "room"),
       };
 
+      await DeviceDB.findOneAndUpdate(
+        { name: "RAINBOW" },
+        {
+          address: _.get(data, "remoteInfo.address"),
+          port: _.get(data, "remoteInfo.port"),
+        }
+      );
+
       if (!_.get(data, "isGroupChat")) {
         chatEvent.emit("send", {
           channelId,
@@ -67,7 +77,7 @@ class KAKAOCLIENT {
       imageEvent.emit("receive", user);
     });
 
-    this.server.on("sendMessage", (payload) => {
+    this.server.on("sendMessage", async (payload) => {
       console.dir(
         {
           method: "kakao-remote, sendMessage",
@@ -83,6 +93,8 @@ class KAKAOCLIENT {
       let address = _.get(senderInfo, "address");
       let port = _.get(senderInfo, "port");
       let room = _.get(senderInfo, "room");
+
+      await DeviceDB.findOneAndUpdate({ name: "RAINBOW" }, { address, port });
 
       let message = _.get(payload, "message");
 
@@ -102,8 +114,6 @@ class KAKAOCLIENT {
 
     // 현재 카링 안됨
     this.server.on("sendKakaolink", async (payload) => {
-      console.dir(payload, { depth: null });
-
       let senderInfo = _.get(payload, "senderInfo");
 
       let address = _.get(senderInfo, "address");
@@ -193,7 +203,7 @@ chatEvent.on("send", (payload) => {
   publishQueue.push(payload);
 });
 
-function queueManager() {
+async function queueManager() {
   if (!_.isEmpty(publishQueue)) {
     //큐에있는 데이터를 가져옴
     let originPayload = publishQueue.shift();
@@ -207,6 +217,15 @@ function queueManager() {
       // 일반 str형태 chat
       if (type === "chat") {
         let senderInfo = _.get(originPayload, "senderInfo");
+        if (!senderInfo) {
+          let device = await DeviceDB.findOne({ name: "RAINBOW" });
+          device = JSON.parse(JSON.stringify(device));
+          senderInfo = {
+            address: _.get(device, "address"),
+            port: _.get(device, "port"),
+            room: channelId,
+          };
+        }
         let message = _.get(originPayload, "data");
 
         kakaoClient.server.emit("sendMessage", {

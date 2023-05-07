@@ -7,11 +7,12 @@ const path = require("path");
 const yaml = require("js-yaml");
 const fs = require("fs");
 
+const DeviceDB = require("../models").Device;
+
 let publishQueue = [];
 let publishTime = new Date().getTime();
 
-const { chatEvent } = require("../core/eventBridge/index");
-const senderCache = require("../core/senderCache");
+const { chatEvent, imageEvent } = require("../core/eventBridge/index");
 
 let configPath = path.join(process.cwd(), "config", "rainbow.develop.yaml");
 let config = yaml.load(fs.readFileSync(configPath));
@@ -23,24 +24,6 @@ class KAKAOCLIENT {
     // this.kakaoLink = null;
 
     this.server.on("message", async (data) => {
-      // heartbeat메세지같은경우 기존로직을 태우지않는다.
-      let method = _.get(data, "content.method");
-      if (method === "heartbeat") {
-        let device = _.get(data, "content.device");
-        let compareResult = senderCache.compare(
-          device,
-          _.get(data, "remoteInfo")
-        );
-
-        if (compareResult == true) {
-          return;
-        } else {
-          console.dir("remoteInfo change");
-          senderCache.set(device, _.get(data, "remoteInfo"));
-          return;
-        }
-        return;
-      }
       /*
             {
               channelId: '947436800941629510',
@@ -51,7 +34,6 @@ class KAKAOCLIENT {
             }
             */
 
-      console.dir(data);
       let channelId = _.get(data, "room");
       let userId = _.get(data, "sender.name");
       let nickname = _.get(data, "sender.name");
@@ -61,6 +43,14 @@ class KAKAOCLIENT {
         port: _.get(data, "remoteInfo.port"),
         room: _.get(data, "room"),
       };
+
+      await DeviceDB.findOneAndUpdate(
+        { name: "RAINBOW" },
+        {
+          address: _.get(data, "remoteInfo.address"),
+          port: _.get(data, "remoteInfo.port"),
+        }
+      );
 
       if (!_.get(data, "isGroupChat")) {
         chatEvent.emit("send", {
@@ -83,9 +73,10 @@ class KAKAOCLIENT {
       };
 
       chatEvent.emit("receive", user);
+      imageEvent.emit("receive", user);
     });
 
-    this.server.on("sendMessage", (payload) => {
+    this.server.on("sendMessage", async (payload) => {
       console.dir(
         {
           method: "kakao-remote, sendMessage",
@@ -101,6 +92,8 @@ class KAKAOCLIENT {
       let address = _.get(senderInfo, "address");
       let port = _.get(senderInfo, "port");
       let room = _.get(senderInfo, "room");
+
+      await DeviceDB.findOneAndUpdate({ name: "RAINBOW" }, { address, port });
 
       let message = _.get(payload, "message");
 
@@ -120,7 +113,24 @@ class KAKAOCLIENT {
 
     // 현재 카링 안됨
     this.server.on("sendKakaolink", async (payload) => {
-      console.dir(payload, { depth: null });
+      let senderInfo = _.get(payload, "senderInfo");
+
+      let address = _.get(senderInfo, "address");
+      let port = _.get(senderInfo, "port");
+      let room = _.get(senderInfo, "room");
+
+      const session = (0, crypto.randomUUID)();
+      const data = encodeURIComponent(
+        JSON.stringify({
+          event: "sendKakaolink",
+          data: {
+            room,
+            payload: JSON.stringify(payload.originPayload.data),
+          },
+          session,
+        })
+      );
+      this.socket.send(data, 0, data.length, port, address);
 
       // // 2021.02 .06
       // // 카링 재로그인 추가
@@ -192,7 +202,7 @@ chatEvent.on("send", (payload) => {
   publishQueue.push(payload);
 });
 
-function queueManager() {
+async function queueManager() {
   if (!_.isEmpty(publishQueue)) {
     //큐에있는 데이터를 가져옴
     let originPayload = publishQueue.shift();
@@ -207,13 +217,14 @@ function queueManager() {
       if (type === "chat") {
         let senderInfo = _.get(originPayload, "senderInfo");
         if (!senderInfo) {
+          let device = await DeviceDB.findOne({ name: "RAINBOW" });
+          device = JSON.parse(JSON.stringify(device));
           senderInfo = {
-            address: "192.168.1.152",
-            port: 34112,
+            address: _.get(device, "address"),
+            port: _.get(device, "port"),
             room: channelId,
           };
         }
-
         let message = _.get(originPayload, "data");
 
         kakaoClient.server.emit("sendMessage", {
@@ -221,7 +232,10 @@ function queueManager() {
           message,
         });
       } else if (type === "kakaolink") {
+        let senderInfo = _.get(originPayload, "senderInfo");
+
         kakaoClient.server.emit("sendKakaolink", {
+          senderInfo,
           originPayload,
         });
       }

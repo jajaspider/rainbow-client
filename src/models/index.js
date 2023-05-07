@@ -6,7 +6,7 @@ const permissionSchema = require("./permission");
 const manageSchema = require("./manage");
 const maplestorySchema = require("./maplestory");
 const lostarkSchema = require("./lostark");
-const sender = require("./sender.model");
+const deviceSchema = require("./device");
 
 // const Selection = mongoose.model('Selection', selectionSchema);
 
@@ -17,5 +17,5 @@ module.exports = {
   Manage: manageSchema,
   Maplestory: maplestorySchema,
   Lostark: lostarkSchema,
-  Sender: sender,
+  Device: deviceSchema,
 };

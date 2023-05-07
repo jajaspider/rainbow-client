@@ -666,11 +666,6 @@ async function exec(methodObj, payload) {
     });
     return;
   } else if (command == COMMAND.DAILY_QUEST) {
-    let url = `http://${_.get(config, "site.domain")}:${_.get(
-      config,
-      "site.port"
-    )}/api/v0/maplestory/exp/quest`;
-
     let level = chatSplit[0];
     try {
       level = parseInt(level);
@@ -684,47 +679,100 @@ async function exec(methodObj, payload) {
       });
       return;
     }
-    let region = chatSplit[1];
+    let regionOrContinent = chatSplit[1];
+    let region = null;
+    let continent = null;
 
-    if (region == "여로" || region == "소멸의여로") {
+    // 여로
+    if (regionOrContinent == "여로" || regionOrContinent == "소멸의여로") {
       region = "VanishingJourney";
-    } else if (region == "츄츄" || region == "츄츄아일랜드") {
+    }
+    // 츄츄
+    else if (
+      regionOrContinent == "츄츄" ||
+      regionOrContinent == "츄츄아일랜드"
+    ) {
       region = "ChuChu";
-    } else if (region == "레헬른") {
+    }
+    // 레헬른
+    else if (regionOrContinent == "레헬른") {
       region = "Lachelein";
-    } else if (region == "아르카나" || region == "알카") {
+    }
+    // 아르카나
+    else if (regionOrContinent == "아르카나" || regionOrContinent == "알카") {
       region = "Arcana";
-    } else if (region == "모라스") {
+    }
+    // 모라스
+    else if (regionOrContinent == "모라스") {
       region = "Morass";
-    } else if (region == "에스페라" || region == "에페") {
+    }
+    // 에스페라
+    else if (regionOrContinent == "에스페라" || regionOrContinent == "에페") {
       region = "Esfera";
-    } else if (region == "문브릿지" || region == "문브") {
+    }
+    // 문브릿지
+    else if (regionOrContinent == "문브릿지" || regionOrContinent == "문브") {
       region = "Moonbridge";
-    } else if (region == "고통의미궁" || region == "미궁") {
+    }
+    // 미궁
+    else if (regionOrContinent == "고통의미궁" || regionOrContinent == "미궁") {
       region = "Labyrinth";
-    } else if (region == "리멘") {
+    }
+    // 리멘
+    else if (regionOrContinent == "리멘") {
       region = "Limina";
-    } else if (
-      region == "세르니움" ||
-      region == "전르" ||
-      region == "전르니움"
+    }
+    // 세르니움
+    else if (
+      regionOrContinent == "세르니움" ||
+      regionOrContinent == "전르" ||
+      regionOrContinent == "전르니움"
     ) {
       region = "Cernium";
-    } else if (
-      region == "불타는세르니움" ||
-      region == "후르" ||
-      region == "후르니움"
+    }
+    // 불타는세르니움
+    else if (
+      regionOrContinent == "불타는세르니움" ||
+      regionOrContinent == "후르" ||
+      regionOrContinent == "후르니움"
     ) {
       region = "BurningCernium";
-    } else if (
-      region == "호텔아르크스" ||
-      region == "호텔" ||
-      region == "아르크스"
+    }
+    // 호텔아르크스
+    else if (
+      regionOrContinent == "호텔아르크스" ||
+      regionOrContinent == "호텔" ||
+      regionOrContinent == "아르크스"
     ) {
       region = "HotelArcus";
-    } else if (region == "오디움" || region == "눈을뜬실험실오디움") {
+    }
+    // 오디움
+    else if (
+      regionOrContinent == "오디움" ||
+      regionOrContinent == "눈을뜬실험실오디움"
+    ) {
       region = "Odium";
-    } else {
+    }
+    // 아케인리버
+    else if (
+      regionOrContinent == "아케인리버" ||
+      regionOrContinent == "아케인"
+    ) {
+      continent = "ArcaneRiver";
+    }
+    // 테네브리스
+    else if (regionOrContinent == "테네브리스" || regionOrContinent == "테네") {
+      continent = "Tenebris";
+    }
+    // 그란디스
+    else if (regionOrContinent == "그란디스") {
+      continent = "Grandis";
+    }
+    // 미입력
+    else if (_.isEmpty(regionOrContinent)) {
+    }
+    // 뭔가 입력
+    else {
       chatEvent.emit("send", {
         channelId,
         type: "chat",
@@ -747,9 +795,16 @@ async function exec(methodObj, payload) {
       });
       return;
     }
+
+    let url = `http://${_.get(config, "site.domain")}:${_.get(
+      config,
+      "site.port"
+    )}/api/v0/maplestory/exp/quest`;
+
     let requestBody = {
       level: chatSplit[0],
       region,
+      continent,
       subCount,
     };
 

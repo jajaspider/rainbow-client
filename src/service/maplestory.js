@@ -663,14 +663,6 @@ async function exec(methodObj, payload) {
     ) {
       region = "Cernium";
     }
-    // 불타는세르니움
-    else if (
-      regionOrContinent == "불타는세르니움" ||
-      regionOrContinent == "후르" ||
-      regionOrContinent == "후르니움"
-    ) {
-      region = "BurningCernium";
-    }
     // 호텔아르크스
     else if (
       regionOrContinent == "호텔아르크스" ||
@@ -685,6 +677,13 @@ async function exec(methodObj, payload) {
       regionOrContinent == "눈을뜬실험실오디움"
     ) {
       region = "Odium";
+    }
+    // 도원경
+    else if (
+      regionOrContinent == "도원경" ||
+      regionOrContinent == "죄인들의낙원도원경"
+    ) {
+      region = "ShangriLa";
     }
     // 아케인리버
     else if (
@@ -703,6 +702,7 @@ async function exec(methodObj, payload) {
     }
     // 미입력
     else if (_.isEmpty(regionOrContinent)) {
+      //
     }
     // 뭔가 입력
     else {

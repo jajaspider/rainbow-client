@@ -140,33 +140,20 @@ async function exec(methodObj, payload) {
     }
 
     let responseData = _.get(response, "data");
-    let errorMessage = _.get(responseData, "payload.message");
-    if (errorMessage) {
-      chatEvent.emit("send", {
-        channelId,
-        type: "chat",
-        data: errorMessage,
-        senderInfo,
-        client,
-      });
-      return;
-    }
-    //정보 명령어용 템플릿
-    let character = _.get(responseData, "payload.character");
 
-    let nickName = _.get(character, "name");
+    let nickName = _.get(responseData, "name");
     // let server = server;
-    let job = _.get(character, "class");
-    let level =  _.get(character, "level");
-    let exp  = _.get(character, "exp");
-    let pop = _.get(character, "pop");
-    let currentRanking = _.get(character, "ranking.current");
-    let changeRanking = _.get(character, "ranking.change");
-    let guild = _.get(character, "guild");
-    let dojangStair  = _.get(character, "dojang.stair", "-");
-    let dojangTime = _.get(character, "dojang.time", "-");
-    let seedStair = _.get(character, "seed.stair", "-");
-    let seedTime = _.get(character, "seed.time", "-");
+    let job = _.get(responseData, "class");
+    let level = _.get(responseData, "level");
+    let exp = _.get(responseData, "exp");
+    let pop = _.get(responseData, "pop");
+    let currentRanking = _.get(responseData, "ranking.current");
+    let changeRanking = _.get(responseData, "ranking.change");
+    let guild = _.get(responseData, "guild");
+    let dojangStair = _.get(responseData, "dojang.stair", "-");
+    let dojangTime = _.get(responseData, "dojang.time", "-");
+    let seedStair = _.get(responseData, "seed.stair", "-");
+    let seedTime = _.get(responseData, "seed.time", "-");
 
     /*
       character_thumbnail: _.get(character, "img"),
@@ -175,19 +162,19 @@ async function exec(methodObj, payload) {
       */
 
     let info = `${nickName}(${pop}) | ${job}\n`;
-      info += `${level} - ${exp}\n`;
-      info += `길드 : ${guild}\n`;
-      info += `랭킹 : ${currentRanking}(${changeRanking})\n\n`;
-      info += `무릉도장 : ${dojangStair}층(${dojangTime})\n`;
-      info += `더시드 : ${seedStair}층(${seedTime})\n`;
+    info += `레벨 : ${level} - ${exp}%\n`;
+    info += `길드 : ${guild}\n`;
+    info += `랭킹 : ${currentRanking}(${changeRanking})\n\n`;
+    info += `무릉도장 : ${dojangStair}층(${dojangTime})\n`;
+    info += `더시드 : ${seedStair}층(${seedTime})\n`;
 
-      chatEvent.emit("send", {
-        channelId,
-        type: "chat",
-        data: info,
-        senderInfo,
-        client,
-      });
+    chatEvent.emit("send", {
+      channelId,
+      type: "chat",
+      data: info,
+      senderInfo,
+      client,
+    });
   }
   // !스타포스
   else if (command == COMMAND.STARFORCE) {
@@ -474,7 +461,7 @@ async function exec(methodObj, payload) {
   }
   // !이벤트
   else if (command == COMMAND.EVENT_LIST) {
-    let maplestoryEndpoint = "https://maplestory.nexon.com"
+    let maplestoryEndpoint = "https://maplestory.nexon.com";
 
     let url = `http://${_.get(config, "site.domain")}:${_.get(
       config,
@@ -510,21 +497,20 @@ async function exec(methodObj, payload) {
 
     let eventInfo = "[메이플스토리 이벤트]";
 
-    for(let _event of eventList){
-      eventInfo+=`\n${_event.title}\n`;
-      eventInfo+=`기간 : ${_event.date}\n`;
-      eventInfo+=`${maplestoryEndpoint}${_event.link}\n`;
+    for (let _event of eventList) {
+      eventInfo += `\n${_event.title}\n`;
+      eventInfo += `기간 : ${_event.date}\n`;
+      eventInfo += `${maplestoryEndpoint}${_event.link}\n`;
     }
 
-     chatEvent.emit("send", {
-        channelId,
-        type: "chat",
-        data: eventInfo,
-        senderInfo,
-        client,
-      });
-      return;
-
+    chatEvent.emit("send", {
+      channelId,
+      type: "chat",
+      data: eventInfo,
+      senderInfo,
+      client,
+    });
+    return;
   }
   // !심볼
   else if (command == COMMAND.SYMBOL) {

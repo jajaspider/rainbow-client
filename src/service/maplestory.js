@@ -541,41 +541,32 @@ async function exec(methodObj, payload) {
       return;
     }
 
-    let responseData = _.get(response, "data");
-    let errorMessage = _.get(responseData, "payload.message");
-    if (errorMessage) {
-      chatEvent.emit("send", {
-        channelId,
-        type: "chat",
-        data: errorMessage,
-        senderInfo,
-        client,
-      });
-      return;
-    }
+    let symbolData = _.get(response, "data");
 
-    let requireArcaneSymbol = _.get(
-      responseData.payload,
-      "symbol.requireArcaneSymbol"
-    );
-    let journeyMeso = _.get(responseData.payload, "symbol.journeyMeso");
+    let requireArcaneSymbol = _.get(symbolData, "requireArcaneSymbol");
+    let journeyMeso = _.get(symbolData, "journeyMeso");
     journeyMeso = journeyMeso.toLocaleString();
-    let chuchuMeso = _.get(responseData.payload, "symbol.chuchuMeso");
+    let chuchuMeso = _.get(symbolData, "chuchuMeso");
     chuchuMeso = chuchuMeso.toLocaleString();
-    let lacheleinMeso = _.get(responseData.payload, "symbol.lacheleinMeso");
+    let lacheleinMeso = _.get(symbolData, "lacheleinMeso");
     lacheleinMeso = lacheleinMeso.toLocaleString();
-    let afterArcanaMeso = _.get(responseData.payload, "symbol.afterArcanaMeso");
-    afterArcanaMeso = afterArcanaMeso.toLocaleString();
-    let requireAthenticSymbol = _.get(
-      responseData.payload,
-      "symbol.requireAthenticSymbol"
-    );
-    let cerniumMeso = _.get(responseData.payload, "symbol.cerniumMeso");
+    let arcanaMeso = _.get(symbolData, "arcanaMeso");
+    arcanaMeso = arcanaMeso.toLocaleString();
+    let morassMeso = _.get(symbolData, "morassMeso");
+    morassMeso = morassMeso.toLocaleString();
+    let esferaMeso = _.get(symbolData, "esferaMeso");
+    esferaMeso = esferaMeso.toLocaleString();
+
+    let requireAthenticSymbol = _.get(symbolData, "requireAthenticSymbol");
+
+    let cerniumMeso = _.get(symbolData, "cerniumMeso");
     cerniumMeso = cerniumMeso.toLocaleString();
-    let arcusMeso = _.get(responseData.payload, "symbol.arcusMeso");
+    let arcusMeso = _.get(symbolData, "arcusMeso");
     arcusMeso = arcusMeso.toLocaleString();
-    let odiumMeso = _.get(responseData.payload, "symbol.odiumMeso");
+    let odiumMeso = _.get(symbolData, "odiumMeso");
     odiumMeso = odiumMeso.toLocaleString();
+    let shangriLaMeso = _.get(symbolData, "shangriLaMeso");
+    shangriLaMeso = shangriLaMeso.toLocaleString();
 
     let symbolInfo = `[심볼 ${parseInt(chatSplit[0])} -> ${parseInt(
       chatSplit[1]
@@ -584,11 +575,14 @@ async function exec(methodObj, payload) {
     symbolInfo += `\n여로 필요 메소 : ${journeyMeso}`;
     symbolInfo += `\n츄츄 필요 메소 : ${chuchuMeso}`;
     symbolInfo += `\n레헬른 필요 메소 : ${lacheleinMeso}`;
-    symbolInfo += `\n아르카나 이후 필요 메소 : ${afterArcanaMeso}`;
+    symbolInfo += `\n아르카나 필요 메소 : ${arcanaMeso}`;
+    symbolInfo += `\n모라스 필요 메소 : ${morassMeso}`;
+    symbolInfo += `\n에스페라 필요 메소 : ${esferaMeso}`;
     symbolInfo += `\n\n어센틱 심볼 : ${requireAthenticSymbol}`;
     symbolInfo += `\n세르니움 필요 메소 : ${cerniumMeso}`;
     symbolInfo += `\n아르크스 필요 메소 : ${arcusMeso}`;
     symbolInfo += `\n오디움 필요 메소 : ${odiumMeso}`;
+    symbolInfo += `\n도원경 필요 메소 : ${shangriLaMeso}`;
 
     chatEvent.emit("send", {
       channelId,

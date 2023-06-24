@@ -681,7 +681,7 @@ async function exec(methodObj, payload) {
     growthInfo += `\n아르카나 필요 메소 : ${arcanaMeso}`;
     growthInfo += `\n모라스 필요 메소 : ${morassMeso}`;
     growthInfo += `\n에스페라 필요 메소 : ${esferaMeso}`;
-    growthInfo += `\n\n어센틱 심볼(여로) : ${cerniumDate[0]}년 ${cerniumDate[1]}월 ${cerniumDate[2]}일`;
+    growthInfo += `\n\n어센틱 심볼(세르) : ${cerniumDate[0]}년 ${cerniumDate[1]}월 ${cerniumDate[2]}일`;
     growthInfo += `\n어센틱 심볼(그외) : ${arthenticDate[0]}년 ${arthenticDate[1]}월 ${arthenticDate[2]}일`;
     growthInfo += `\n세르니움 필요 메소 : ${cerniumMeso}`;
     growthInfo += `\n아르크스 필요 메소 : ${arcusMeso}`;

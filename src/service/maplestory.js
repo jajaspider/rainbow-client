@@ -28,6 +28,7 @@ const COMMAND = {
   SYMBOL: "symbol",
   DAILY_QUEST: "dailyQuest",
   MONSTER_PARK: "monsterPark",
+  SYMBOL_GROWTH: "symbolGrowth",
 };
 
 async function exec(methodObj, payload) {
@@ -592,7 +593,112 @@ async function exec(methodObj, payload) {
       client,
     });
     return;
-  } else if (command == COMMAND.DAILY_QUEST) {
+  }
+
+  //심볼 성장치
+  else if (command == COMMAND.SYMBOL_GROWTH) {
+    let level = chatSplit[0];
+    let count = chatSplit[1];
+
+    if (chatLength != 2) {
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: "잘못 입력하셨습니다.",
+        senderInfo,
+        client,
+      });
+      return;
+    }
+
+    level = parseInt(level);
+    count = parseInt(count);
+
+    if (_.isNaN(level) || _.isNaN(count)) {
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: "숫자로 입력하세요.",
+        senderInfo,
+        client,
+      });
+      return;
+    }
+
+    let url = `http://${_.get(config, "site.domain")}:${_.get(
+      config,
+      "site.port"
+    )}/api/v0/maplestory/symbol/growth`;
+    let response = await axios.post(url, {
+      level,
+      count,
+    });
+    if (response.status != 200) {
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: "api 데이터 수신 실패",
+        senderInfo,
+        client,
+      });
+      return;
+    }
+
+    let growthData = _.get(response, "data");
+
+    let arcaneDate = _.split(_.get(growthData, "arcaneDate"), "-");
+
+    let journeyMeso = _.get(growthData, "journeyMeso");
+    journeyMeso = journeyMeso.toLocaleString();
+    let chuchuMeso = _.get(growthData, "chuchuMeso");
+    chuchuMeso = chuchuMeso.toLocaleString();
+    let lacheleinMeso = _.get(growthData, "lacheleinMeso");
+    lacheleinMeso = lacheleinMeso.toLocaleString();
+    let arcanaMeso = _.get(growthData, "arcanaMeso");
+    arcanaMeso = arcanaMeso.toLocaleString();
+    let morassMeso = _.get(growthData, "morassMeso");
+    morassMeso = morassMeso.toLocaleString();
+    let esferaMeso = _.get(growthData, "esferaMeso");
+    esferaMeso = esferaMeso.toLocaleString();
+
+    let cerniumDate = _.split(_.get(growthData, "cerniumDate"), "-");
+    let arthenticDate = _.split(_.get(growthData, "arthenticDate"), "-");
+
+    let cerniumMeso = _.get(growthData, "cerniumMeso");
+    cerniumMeso = cerniumMeso.toLocaleString();
+    let arcusMeso = _.get(growthData, "arcusMeso");
+    arcusMeso = arcusMeso.toLocaleString();
+    let odiumMeso = _.get(growthData, "odiumMeso");
+    odiumMeso = odiumMeso.toLocaleString();
+    let shangriLaMeso = _.get(growthData, "shangriLaMeso");
+    shangriLaMeso = shangriLaMeso.toLocaleString();
+
+    let growthInfo = `[심볼 성장]\n`;
+    growthInfo += `\n아케인 심볼 : ${arcaneDate[0]}년 ${arcaneDate[1]}월 ${arcaneDate[2]}일`;
+    growthInfo += `\n여로 필요 메소 : ${journeyMeso}`;
+    growthInfo += `\n츄츄 필요 메소 : ${chuchuMeso}`;
+    growthInfo += `\n레헬른 필요 메소 : ${lacheleinMeso}`;
+    growthInfo += `\n아르카나 필요 메소 : ${arcanaMeso}`;
+    growthInfo += `\n모라스 필요 메소 : ${morassMeso}`;
+    growthInfo += `\n에스페라 필요 메소 : ${esferaMeso}`;
+    growthInfo += `\n\n어센틱 심볼(여로) : ${cerniumDate[0]}년 ${cerniumDate[1]}월 ${cerniumDate[2]}일`;
+    growthInfo += `\n어센틱 심볼(그외) : ${arthenticDate[0]}년 ${arthenticDate[1]}월 ${arthenticDate[2]}일`;
+    growthInfo += `\n세르니움 필요 메소 : ${cerniumMeso}`;
+    growthInfo += `\n아르크스 필요 메소 : ${arcusMeso}`;
+    growthInfo += `\n오디움 필요 메소 : ${odiumMeso}`;
+    growthInfo += `\n도원경 필요 메소 : ${shangriLaMeso}`;
+
+    chatEvent.emit("send", {
+      channelId,
+      type: "chat",
+      data: growthInfo,
+      senderInfo,
+      client,
+    });
+    return;
+  }
+  // 일일퀘스트
+  else if (command == COMMAND.DAILY_QUEST) {
     let level = chatSplit[0];
     try {
       level = parseInt(level);

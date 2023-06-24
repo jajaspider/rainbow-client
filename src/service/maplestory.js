@@ -647,46 +647,30 @@ async function exec(methodObj, payload) {
     let growthData = _.get(response, "data");
 
     let arcaneDate = _.split(_.get(growthData, "arcaneDate"), "-");
-
-    let journeyMeso = _.get(growthData, "journeyMeso");
-    journeyMeso = journeyMeso.toLocaleString();
-    let chuchuMeso = _.get(growthData, "chuchuMeso");
-    chuchuMeso = chuchuMeso.toLocaleString();
-    let lacheleinMeso = _.get(growthData, "lacheleinMeso");
-    lacheleinMeso = lacheleinMeso.toLocaleString();
-    let arcanaMeso = _.get(growthData, "arcanaMeso");
-    arcanaMeso = arcanaMeso.toLocaleString();
-    let morassMeso = _.get(growthData, "morassMeso");
-    morassMeso = morassMeso.toLocaleString();
-    let esferaMeso = _.get(growthData, "esferaMeso");
-    esferaMeso = esferaMeso.toLocaleString();
+    let requireArcane = _.get(growthData, "requireArcane");
+    let arcaneWeek = _.get(growthData, "arcaneWeek");
+    let arcaneDay = _.get(growthData, "arcaneDay");
 
     let cerniumDate = _.split(_.get(growthData, "cerniumDate"), "-");
     let arthenticDate = _.split(_.get(growthData, "arthenticDate"), "-");
-
-    let cerniumMeso = _.get(growthData, "cerniumMeso");
-    cerniumMeso = cerniumMeso.toLocaleString();
-    let arcusMeso = _.get(growthData, "arcusMeso");
-    arcusMeso = arcusMeso.toLocaleString();
-    let odiumMeso = _.get(growthData, "odiumMeso");
-    odiumMeso = odiumMeso.toLocaleString();
-    let shangriLaMeso = _.get(growthData, "shangriLaMeso");
-    shangriLaMeso = shangriLaMeso.toLocaleString();
+    let requireAthentic = _.get(growthData, "requireAthentic");
+    let cerniumDay = _.get(growthData, "cerniumDay");
 
     let growthInfo = `[심볼 성장]\n`;
+    growthInfo += `\n# 아케인\n`;
+
+    growthInfo += `\n총 필요갯수 : ${requireArcane}`;
     growthInfo += `\n아케인 심볼 : ${arcaneDate[0]}년 ${arcaneDate[1]}월 ${arcaneDate[2]}일`;
-    growthInfo += `\n여로 필요 메소 : ${journeyMeso}`;
-    growthInfo += `\n츄츄 필요 메소 : ${chuchuMeso}`;
-    growthInfo += `\n레헬른 필요 메소 : ${lacheleinMeso}`;
-    growthInfo += `\n아르카나 필요 메소 : ${arcanaMeso}`;
-    growthInfo += `\n모라스 필요 메소 : ${morassMeso}`;
-    growthInfo += `\n에스페라 필요 메소 : ${esferaMeso}`;
-    growthInfo += `\n\n어센틱 심볼(세르) : ${cerniumDate[0]}년 ${cerniumDate[1]}월 ${cerniumDate[2]}일`;
-    growthInfo += `\n어센틱 심볼(그외) : ${arthenticDate[0]}년 ${arthenticDate[1]}월 ${arthenticDate[2]}일`;
-    growthInfo += `\n세르니움 필요 메소 : ${cerniumMeso}`;
-    growthInfo += `\n아르크스 필요 메소 : ${arcusMeso}`;
-    growthInfo += `\n오디움 필요 메소 : ${odiumMeso}`;
-    growthInfo += `\n도원경 필요 메소 : ${shangriLaMeso}`;
+
+    growthInfo += `\n${arcaneWeek}주 ${arcaneDay}일 소요`;
+
+    if (level < 11) {
+      growthInfo += `\n\n# 어센틱\n`;
+      growthInfo += `\n총 필요갯수 : ${requireAthentic}`;
+      growthInfo += `\n어센틱 심볼(세르) : ${cerniumDate[0]}년 ${cerniumDate[1]}월 ${cerniumDate[2]}일`;
+      growthInfo += `\n어센틱 심볼(그외) : ${arthenticDate[0]}년 ${arthenticDate[1]}월 ${arthenticDate[2]}일`;
+      growthInfo += `\n${cerniumDay}일 소요`;
+    }
 
     chatEvent.emit("send", {
       channelId,

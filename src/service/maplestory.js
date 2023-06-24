@@ -655,6 +655,7 @@ async function exec(methodObj, payload) {
     let arthenticDate = _.split(_.get(growthData, "arthenticDate"), "-");
     let requireAthentic = _.get(growthData, "requireAthentic");
     let cerniumDay = _.get(growthData, "cerniumDay");
+    let arthenticDay = _.get(growthData, "arthenticDay");
 
     let growthInfo = `[심볼 성장]\n`;
     growthInfo += `\n# 아케인\n`;
@@ -668,8 +669,9 @@ async function exec(methodObj, payload) {
       growthInfo += `\n\n# 어센틱\n`;
       growthInfo += `\n총 필요갯수 : ${requireAthentic}`;
       growthInfo += `\n어센틱 심볼(세르) : ${cerniumDate[0]}년 ${cerniumDate[1]}월 ${cerniumDate[2]}일`;
-      growthInfo += `\n어센틱 심볼(그외) : ${arthenticDate[0]}년 ${arthenticDate[1]}월 ${arthenticDate[2]}일`;
       growthInfo += `\n${cerniumDay}일 소요`;
+      growthInfo += `\n어센틱 심볼(그외) : ${arthenticDate[0]}년 ${arthenticDate[1]}월 ${arthenticDate[2]}일`;
+      growthInfo += `\n${arthenticDay}일 소요`;
     }
 
     chatEvent.emit("send", {

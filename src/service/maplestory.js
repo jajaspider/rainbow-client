@@ -28,6 +28,7 @@ const COMMAND = {
   SYMBOL: "symbol",
   DAILY_QUEST: "dailyQuest",
   MONSTER_PARK: "monsterPark",
+  SYMBOL_GROWTH: "symbolGrowth",
 };
 
 async function exec(methodObj, payload) {
@@ -592,7 +593,98 @@ async function exec(methodObj, payload) {
       client,
     });
     return;
-  } else if (command == COMMAND.DAILY_QUEST) {
+  }
+
+  //심볼 성장치
+  else if (command == COMMAND.SYMBOL_GROWTH) {
+    let level = chatSplit[0];
+    let count = chatSplit[1];
+
+    if (chatLength != 2) {
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: "잘못 입력하셨습니다.",
+        senderInfo,
+        client,
+      });
+      return;
+    }
+
+    level = parseInt(level);
+    count = parseInt(count);
+
+    if (_.isNaN(level) || _.isNaN(count)) {
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: "숫자로 입력하세요.",
+        senderInfo,
+        client,
+      });
+      return;
+    }
+
+    let url = `http://${_.get(config, "site.domain")}:${_.get(
+      config,
+      "site.port"
+    )}/api/v0/maplestory/symbol/growth`;
+    let response = await axios.post(url, {
+      level,
+      count,
+    });
+    if (response.status != 200) {
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: "api 데이터 수신 실패",
+        senderInfo,
+        client,
+      });
+      return;
+    }
+
+    let growthData = _.get(response, "data");
+
+    let arcaneDate = _.split(_.get(growthData, "arcaneDate"), "-");
+    let requireArcane = _.get(growthData, "requireArcane");
+    let arcaneWeek = _.get(growthData, "arcaneWeek");
+    let arcaneDay = _.get(growthData, "arcaneDay");
+
+    let cerniumDate = _.split(_.get(growthData, "cerniumDate"), "-");
+    let arthenticDate = _.split(_.get(growthData, "arthenticDate"), "-");
+    let requireAthentic = _.get(growthData, "requireAthentic");
+    let cerniumDay = _.get(growthData, "cerniumDay");
+    let arthenticDay = _.get(growthData, "arthenticDay");
+
+    let growthInfo = `[심볼 성장]\n`;
+    growthInfo += `\n# 아케인\n`;
+
+    growthInfo += `\n총 필요갯수 : ${requireArcane}`;
+    growthInfo += `\n아케인 심볼 : ${arcaneDate[0]}년 ${arcaneDate[1]}월 ${arcaneDate[2]}일`;
+
+    growthInfo += `\n${arcaneWeek}주 ${arcaneDay}일 소요`;
+
+    if (level < 11) {
+      growthInfo += `\n\n# 어센틱\n`;
+      growthInfo += `\n총 필요갯수 : ${requireAthentic}`;
+      growthInfo += `\n어센틱 심볼(세르) : ${cerniumDate[0]}년 ${cerniumDate[1]}월 ${cerniumDate[2]}일`;
+      growthInfo += `\n${cerniumDay}일 소요`;
+      growthInfo += `\n어센틱 심볼(그외) : ${arthenticDate[0]}년 ${arthenticDate[1]}월 ${arthenticDate[2]}일`;
+      growthInfo += `\n${arthenticDay}일 소요`;
+    }
+
+    chatEvent.emit("send", {
+      channelId,
+      type: "chat",
+      data: growthInfo,
+      senderInfo,
+      client,
+    });
+    return;
+  }
+  // 일일퀘스트
+  else if (command == COMMAND.DAILY_QUEST) {
     let level = chatSplit[0];
     try {
       level = parseInt(level);

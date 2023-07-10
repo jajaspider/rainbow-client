@@ -429,27 +429,14 @@ async function exec(methodObj, payload) {
     }
 
     let responseData = _.get(response, "data");
-    let errorMessage = _.get(responseData, "payload.message");
-    if (errorMessage) {
-      chatEvent.emit("send", {
-        channelId,
-        type: "chat",
-        data: errorMessage,
-        senderInfo,
-        client,
-      });
-      return;
-    }
 
-    let characterName = _.get(responseData, "payload.character.name");
-    let unionRanking = _.get(responseData, "payload.character.unionRanking");
-    let unionLevel = _.get(responseData, "payload.character.unionLevel");
-    let unionPower = _.get(responseData, "payload.character.unionPower");
-    let unionCoinPerDay = _.get(
-      responseData,
-      "payload.character.unionCoinPerDay"
-    );
-    let message = `[${characterName}님의 유니온 정보]\n랭킹 : ${unionRanking}\n레벨 : ${unionLevel}\n공격력 : ${unionPower}\n일일 코인 획득량 : ${unionCoinPerDay}`;
+    let nickName = _.get(responseData, "name");
+    let unionRanking = _.get(responseData, "unionRanking");
+    let unionLevel = _.get(responseData, "unionLevel");
+    let unionPower = _.get(responseData, "unionPower");
+    let unionCoinPerDay = _.get(responseData, "unionCoinPerDay");
+
+    let message = `[${nickName}님의 유니온 정보]\n랭킹 : ${unionRanking}\n레벨 : ${unionLevel}\n공격력 : ${unionPower}\n일일 코인 획득량 : ${unionCoinPerDay}`;
 
     chatEvent.emit("send", {
       channelId,

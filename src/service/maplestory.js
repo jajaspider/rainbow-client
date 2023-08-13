@@ -555,6 +555,10 @@ async function exec(methodObj, payload) {
     odiumMeso = odiumMeso.toLocaleString();
     let shangriLaMeso = _.get(symbolData, "shangriLaMeso");
     shangriLaMeso = shangriLaMeso.toLocaleString();
+    let arteriaMeso = _.get(symbolData, "arteriaMeso");
+    arteriaMeso = arteriaMeso.toLocaleString();
+    let carcionMeso = _.get(symbolData, "carcionMeso");
+    carcionMeso = carcionMeso.toLocaleString();
 
     let symbolInfo = `[심볼 ${parseInt(chatSplit[0])} -> ${parseInt(
       chatSplit[1]
@@ -571,6 +575,8 @@ async function exec(methodObj, payload) {
     symbolInfo += `\n아르크스 필요 메소 : ${arcusMeso}`;
     symbolInfo += `\n오디움 필요 메소 : ${odiumMeso}`;
     symbolInfo += `\n도원경 필요 메소 : ${shangriLaMeso}`;
+    symbolInfo += `\n아르테리아 필요 메소 : ${arteriaMeso}`;
+    symbolInfo += `\n카르시온 필요 메소 : ${carcionMeso}`;
 
     chatEvent.emit("send", {
       channelId,

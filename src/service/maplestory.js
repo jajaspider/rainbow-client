@@ -765,6 +765,10 @@ async function exec(methodObj, payload) {
     ) {
       region = "Arteria";
     }
+    // 카르시온
+    else if (regionOrContinent == "카르시온") {
+      region = "Carcion";
+    }
     // 아케인리버
     else if (
       regionOrContinent == "아케인리버" ||

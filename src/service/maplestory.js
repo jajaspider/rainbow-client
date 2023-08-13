@@ -843,12 +843,36 @@ async function exec(methodObj, payload) {
       return;
     }
   } else if (command == COMMAND.MONSTER_PARK) {
-    let url = `http://${_.get(config, "site.domain")}:${_.get(
-      config,
-      "site.port"
-    )}/api/v0/maplestory/exp/monsterpark`;
+    if (chatLength < 1 || chatLength > 3) {
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: "잘못 입력하셨습니다.",
+        senderInfo,
+        client,
+      });
+      return;
+    }
+
+    // chat의 길이가1이면 익몬, 그외 2,3이면 일반 몬파
+    let url = null;
+    if (chatLength == 1) {
+      url = `http://${_.get(config, "site.domain")}:${_.get(
+        config,
+        "site.port"
+      )}/api/v0/maplestory/exp/extrememonsterpark`;
+    } else {
+      url = `http://${_.get(config, "site.domain")}:${_.get(
+        config,
+        "site.port"
+      )}/api/v0/maplestory/exp/monsterpark`;
+    }
 
     let level = chatSplit[0];
+    let region = chatSplit[1];
+    //익몬은 count가 입력되어있지않기때문에 1회로 취급하기위함
+    let count = chatSplit[2] || 1;
+
     try {
       level = parseInt(level);
     } catch (e) {
@@ -862,17 +886,145 @@ async function exec(methodObj, payload) {
       return;
     }
 
+    try {
+      count = parseInt(count);
+    } catch (e) {
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: "횟수를 잘못 입력하셨습니다.",
+        senderInfo,
+        client,
+      });
+      return;
+    }
+
+    //자동 경비 구역
+    if (region == "자동경비구역") {
+      region = "AutoSecurityArea";
+    }
+    // 이끼나무 숲
+    else if (region == "이끼나무숲") {
+      region = "MossyTreeForest";
+    }
+    // 하늘 숲 수련장
+    else if (region == "하늘숲수련장") {
+      region = "SkyForestTrainingCenter";
+    }
+    // 해적단의 비밀 기지
+    else if (region == "해적단의비밀기지") {
+      region = "SecretPirateHideout";
+    }
+    // 이계의 전장
+    else if (region == "이계의전장") {
+      region = "OtherworldBattleground";
+    }
+    // 외딴 숲 위험 지역
+    else if (region == "외딴숲위험지역") {
+      region = "DangerouslyIsolatedForest";
+    }
+    // 금지된 시간
+    else if (region == "금지된시간") {
+      region = "ForbiddenTime";
+    }
+    // 숨겨진 유적
+    else if (region == "숨겨진유적") {
+      region = "ClandestineRuins";
+    }
+    // 폐허가 된 도시
+    else if (region == "폐허가된도시") {
+      region = "RuinedCity";
+    }
+    // 죽은 나무의 숲
+    else if (region == "죽은나무의숲") {
+      region = "ForestofDeadTrees";
+    }
+    // 감시의 탑
+    else if (region == "감시의탑") {
+      region = "WatchmanTower";
+    }
+    // 용의 둥지
+    else if (region == "용의둥지") {
+      region = "DragonNest";
+    }
+    // 망각의 신전
+    else if (region == "망각의신전") {
+      region = "TempleofOblivion";
+    }
+    // 기사단의 요새
+    else if (region == "기사단의요새") {
+      region = "KnightStronghold";
+    }
+    // 원혼의 협곡
+    else if (region == "원혼의협곡") {
+      region = "SpiritValley";
+    }
+    // 여로
+    else if (region == "여로" || region == "소멸의여로") {
+      region = "VanishingJourney";
+    }
+    // 츄츄
+    else if (region == "츄츄" || region == "츄츄아일랜드") {
+      region = "ChuChu";
+    }
+    // 레헬른
+    else if (region == "레헬른") {
+      region = "Lachelein";
+    }
+    // 아르카나
+    else if (region == "아르카나" || region == "알카") {
+      region = "Arcana";
+    }
+    // 모라스
+    else if (region == "모라스") {
+      region = "Morass";
+    }
+    // 에스페라
+    else if (region == "에스페라" || region == "에페") {
+      region = "Esfera";
+    }
+    // 셀라스
+    else if (region == "셀라스") {
+      region = "Sellas";
+    }
+    // 문브릿지
+    else if (region == "문브릿지" || region == "문브") {
+      region = "Moonbridge";
+    }
+    // 미궁
+    else if (region == "고통의미궁" || region == "미궁") {
+      region = "Labyrinth";
+    }
+    // 리멘
+    else if (region == "리멘") {
+      region = "Limina";
+    }
+
     let requestBody = {
-      level: chatSplit[0],
+      level,
+      region,
     };
 
     try {
       let response = await axios.post(url, requestBody);
+      // 서버로 부터 받은 정보가 없음 -> 잘못된 데이터 입력일 확률 높음
+      if (response.status == 204) {
+        chatEvent.emit("send", {
+          channelId,
+          type: "chat",
+          data: "입력 값 확인",
+          senderInfo,
+          client,
+        });
+        return;
+      }
+
       let responseData = _.get(response, "data");
+      let raiseUpExp = responseData * count;
       chatEvent.emit("send", {
         channelId,
         type: "chat",
-        data: `${level}에서 몬스터파크 완료 시 ${responseData}% 상승`,
+        data: `${level}에서 몬스터파크 완료 시 ${raiseUpExp}% 상승`,
         senderInfo,
         client,
       });

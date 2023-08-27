@@ -59,12 +59,12 @@ async function exec(methodObj, payload) {
       break;
     case "info":
       if (chat == null) {
-        url = `http://${_.get(config, "site.domain")}:${_.get(
+        url = `${_.get(config, "site.domain")}:${_.get(
           config,
           "site.port"
         )}/api/v0/lostark/info/${encodeURIComponent(nickname)}`;
       } else if (chatLength == 1) {
-        url = `http://${_.get(config, "site.domain")}:${_.get(
+        url = `${_.get(config, "site.domain")}:${_.get(
           config,
           "site.port"
         )}/api/v0/lostark/info/${encodeURIComponent(chat)}`;
@@ -164,7 +164,7 @@ async function exec(methodObj, payload) {
 
     case "crystal":
       response = await axios.get(
-        `http://${_.get(config, "site.domain")}:${_.get(
+        `${_.get(config, "site.domain")}:${_.get(
           config,
           "site.port"
         )}/api/v0/lostark/crystal`
@@ -200,12 +200,12 @@ async function exec(methodObj, payload) {
       break;
     case "expand":
       if (chat == null) {
-        url = `http://${_.get(config, "site.domain")}:${_.get(
+        url = `${_.get(config, "site.domain")}:${_.get(
           config,
           "site.port"
         )}/api/v0/lostark/expand/${encodeURIComponent(nickname)}`;
       } else if (chatLength == 1) {
-        url = `http://${_.get(config, "site.domain")}:${_.get(
+        url = `${_.get(config, "site.domain")}:${_.get(
           config,
           "site.port"
         )}/api/v0/lostark/expand/${encodeURIComponent(chat)}`;
@@ -262,7 +262,7 @@ async function exec(methodObj, payload) {
       });
       break;
     case "eventList":
-      url = `http://${_.get(config, "site.domain")}:${_.get(
+      url = `${_.get(config, "site.domain")}:${_.get(
         config,
         "site.port"
       )}/api/v0/lostark/event`;
@@ -290,15 +290,15 @@ async function exec(methodObj, payload) {
       }
       let eventList = _.get(responseData, "payload.events");
 
-      let maplestoryEndpoint = "https://lostark.game.onstove.com/"
+      let maplestoryEndpoint = "https://lostark.game.onstove.com/";
       let eventInfo = "[로스트아크 이벤트]";
-      for(let _event of eventList){
-      eventInfo+=`\n${_event.title}\n`;
-      eventInfo+=`${_event.term}\n`;
-      eventInfo+=`${maplestoryEndpoint}${_event.link}\n`;
-    }
+      for (let _event of eventList) {
+        eventInfo += `\n${_event.title}\n`;
+        eventInfo += `${_event.term}\n`;
+        eventInfo += `${maplestoryEndpoint}${_event.link}\n`;
+      }
 
-     chatEvent.emit("send", {
+      chatEvent.emit("send", {
         channelId,
         type: "chat",
         data: eventInfo,
@@ -309,12 +309,12 @@ async function exec(methodObj, payload) {
       break;
     case "jewel":
       if (chat == null) {
-        url = `http://${_.get(config, "site.domain")}:${_.get(
+        url = `${_.get(config, "site.domain")}:${_.get(
           config,
           "site.port"
         )}/api/v0/lostark/info/${encodeURIComponent(nickname)}`;
       } else if (chatLength == 1) {
-        url = `http://${_.get(config, "site.domain")}:${_.get(
+        url = `${_.get(config, "site.domain")}:${_.get(
           config,
           "site.port"
         )}/api/v0/lostark/info/${encodeURIComponent(chat)}`;
@@ -375,12 +375,12 @@ async function exec(methodObj, payload) {
 
     case "collection":
       if (chat == null) {
-        url = `http://${_.get(config, "site.domain")}:${_.get(
+        url = `${_.get(config, "site.domain")}:${_.get(
           config,
           "site.port"
         )}/api/v0/lostark/info/${encodeURIComponent(nickname)}`;
       } else if (chatLength == 1) {
-        url = `http://${_.get(config, "site.domain")}:${_.get(
+        url = `${_.get(config, "site.domain")}:${_.get(
           config,
           "site.port"
         )}/api/v0/lostark/info/${encodeURIComponent(chat)}`;
@@ -445,7 +445,7 @@ async function exec(methodObj, payload) {
         });
         return;
       }
-      url = `http://${_.get(config, "site.domain")}:${_.get(
+      url = `${_.get(config, "site.domain")}:${_.get(
         config,
         "site.port"
       )}/api/v0/lostark/distribute/${chat}`;
@@ -583,14 +583,13 @@ async function exec(methodObj, payload) {
       return;
     }
 
-    //http://localhost:30003/v0/lostark/markets/itemSearch
     let params = {
       categoryName: _itemCategory,
       itemName: _itemName,
     };
 
     let result = await axios.post(
-      `http://${_.get(config, "site.domain")}:${_.get(
+      `${_.get(config, "site.domain")}:${_.get(
         config,
         "site.port"
       )}/api/v0/lostark/markets/itemSearch`,

@@ -50,7 +50,7 @@ async function exec(methodObj, payload) {
     if (chat == null) {
       let type = _.get(methodObj, "params.type");
       let result = await axios.get(
-        `http://${_.get(config, "site.domain")}:${_.get(
+        `${_.get(config, "site.domain")}:${_.get(
           config,
           "site.port"
         )}/api/v0/${command}/${type}`
@@ -118,12 +118,12 @@ async function exec(methodObj, payload) {
   else if (command == COMMAND.INFO) {
     let requestUrl = null;
     if (chat == null) {
-      requestUrl = `http://${_.get(config, "site.domain")}:${_.get(
+      requestUrl = `${_.get(config, "site.domain")}:${_.get(
         config,
         "site.port"
       )}/api/v0/maplestory/info/${encodeURIComponent(nickname)}`;
     } else {
-      requestUrl = `http://${_.get(config, "site.domain")}:${_.get(
+      requestUrl = `${_.get(config, "site.domain")}:${_.get(
         config,
         "site.port"
       )}/api/v0/maplestory/info/${encodeURIComponent(chat)}`;
@@ -191,7 +191,7 @@ async function exec(methodObj, payload) {
       return;
     }
 
-    let requestUrl = `http://${_.get(config, "site.domain")}:${_.get(
+    let requestUrl = `${_.get(config, "site.domain")}:${_.get(
       config,
       "site.port"
     )}/api/v0/maplestory/starforce/${chatSplit[0]}/${chatSplit[1]}`;
@@ -243,7 +243,7 @@ async function exec(methodObj, payload) {
 
     let type = _.get(methodObj, "params.type");
     let response = await axios({
-      url: `http://${_.get(config, "site.domain")}:${_.get(
+      url: `${_.get(config, "site.domain")}:${_.get(
         config,
         "site.port"
       )}/api/v0/maplestory/growth/${chat}`,
@@ -369,12 +369,12 @@ async function exec(methodObj, payload) {
   else if (command == COMMAND.CLASS_SELECTION) {
     let url = null;
     if (chat == null) {
-      url = `http://${_.get(config, "site.domain")}:${_.get(
+      url = `${_.get(config, "site.domain")}:${_.get(
         config,
         "site.port"
       )}/api/v0/selection/maple/class`;
     } else if (chatLength == 1) {
-      url = `http://${_.get(config, "site.domain")}:${_.get(
+      url = `${_.get(config, "site.domain")}:${_.get(
         config,
         "site.port"
       )}/api/v0/selection/maple/class/${encodeURIComponent(chat)}`;
@@ -406,12 +406,12 @@ async function exec(methodObj, payload) {
   else if (command == COMMAND.UNION) {
     let url = null;
     if (chat == null) {
-      url = `http://${_.get(config, "site.domain")}:${_.get(
+      url = `${_.get(config, "site.domain")}:${_.get(
         config,
         "site.port"
       )}/api/v0/maplestory/union/${encodeURIComponent(nickname)}`;
     } else if (chatLength == 1) {
-      url = `http://${_.get(config, "site.domain")}:${_.get(
+      url = `${_.get(config, "site.domain")}:${_.get(
         config,
         "site.port"
       )}/api/v0/maplestory/union/${encodeURIComponent(chatSplit[0])}`;
@@ -452,7 +452,7 @@ async function exec(methodObj, payload) {
   else if (command == COMMAND.EVENT_LIST) {
     let maplestoryEndpoint = "https://maplestory.nexon.com";
 
-    let url = `http://${_.get(config, "site.domain")}:${_.get(
+    let url = `${_.get(config, "site.domain")}:${_.get(
       config,
       "site.port"
     )}/api/v0/maplestory/event`;
@@ -514,7 +514,7 @@ async function exec(methodObj, payload) {
       return;
     }
 
-    let url = `http://${_.get(config, "site.domain")}:${_.get(
+    let url = `${_.get(config, "site.domain")}:${_.get(
       config,
       "site.port"
     )}/api/v0/maplestory/symbol/${chatSplit[0]}/${chatSplit[1]}`;
@@ -619,7 +619,7 @@ async function exec(methodObj, payload) {
       return;
     }
 
-    let url = `http://${_.get(config, "site.domain")}:${_.get(
+    let url = `${_.get(config, "site.domain")}:${_.get(
       config,
       "site.port"
     )}/api/v0/maplestory/symbol/growth`;
@@ -820,7 +820,7 @@ async function exec(methodObj, payload) {
       return;
     }
 
-    let url = `http://${_.get(config, "site.domain")}:${_.get(
+    let url = `${_.get(config, "site.domain")}:${_.get(
       config,
       "site.port"
     )}/api/v0/maplestory/exp/quest`;
@@ -868,12 +868,12 @@ async function exec(methodObj, payload) {
     // chat의 길이가1이면 익몬, 그외 2,3이면 일반 몬파
     let url = null;
     if (chatLength == 1) {
-      url = `http://${_.get(config, "site.domain")}:${_.get(
+      url = `${_.get(config, "site.domain")}:${_.get(
         config,
         "site.port"
       )}/api/v0/maplestory/exp/extrememonsterpark`;
     } else {
-      url = `http://${_.get(config, "site.domain")}:${_.get(
+      url = `${_.get(config, "site.domain")}:${_.get(
         config,
         "site.port"
       )}/api/v0/maplestory/exp/monsterpark`;
@@ -1063,7 +1063,7 @@ async function exec(methodObj, payload) {
     }
 
     // chat의 길이가1이면 익몬, 그외 2,3이면 일반 몬파
-    let url = `http://${_.get(config, "site.domain")}:${_.get(
+    let url = `${_.get(config, "site.domain")}:${_.get(
       config,
       "site.port"
     )}/api/v0/maplestory/util/cooldown`;

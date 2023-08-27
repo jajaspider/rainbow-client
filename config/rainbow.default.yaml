@@ -1,13 +1,13 @@
 mongo:
-  ip : 127.0.0.1
-  port : 27017
-  database : kakaobot
+  ip: 127.0.0.1
+  port: 27017
+  database: kakaobot
 
 device:
-  uuid : your-uuid
-  name : your-name
-  email : your-email
-  password : your-password
+  uuid: your-uuid
+  name: your-name
+  email: your-email
+  password: your-password
 
 rabbitmq:
   ip: 127.0.0.1
@@ -15,14 +15,14 @@ rabbitmq:
   exchange: rainbow
 
 kakaoLink:
-  javascriptKey: ''
-  domain: ''
-  email: ''
-  password: ''
+  javascriptKey: ""
+  domain: ""
+  email: ""
+  password: ""
 
 discord:
   token: "your-token"
 
 site:
-  domain: "your-domain"
-  port: 'your-port(int)'
+  domain: "your-protocol://your-domain"
+  port: "your-port(int)"

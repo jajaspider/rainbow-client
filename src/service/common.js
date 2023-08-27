@@ -1,31 +1,29 @@
 const _ = require("lodash");
 const axios = require("axios");
 const async = require("async");
-const path = require('path');
-const fs = require('fs');
-const yaml = require('js-yaml');
+const path = require("path");
+const fs = require("fs");
+const yaml = require("js-yaml");
 
 const Common = require("../models/index").Common;
-const {
-  chatEvent
-} = require('../core/eventBridge');
+const { chatEvent } = require("../core/eventBridge");
 const COMPRES = "\u200b".repeat(500);
-let configPath = path.join(process.cwd(), 'config', 'rainbow.develop.yaml');
+let configPath = path.join(process.cwd(), "config", "rainbow.develop.yaml");
 let config = yaml.load(fs.readFileSync(configPath));
 
 const COMMAND = {
-  SELECTION: 'selection',
-  HELP: 'help',
-}
+  SELECTION: "selection",
+  HELP: "help",
+};
 
 async function exec(methodObj, payload) {
   //chat은 command부분이 제거된 상태
-  let chat = _.get(payload, 'chat');
+  let chat = _.get(payload, "chat");
   const chatLength = _.split(chat, " ").length;
-  const channelId = _.get(payload, 'channelId');
-  const nickname = _.get(payload, 'nickname');
-  const client = _.get(payload, 'client');
-  const senderInfo = _.get(payload, 'senderInfo');
+  const channelId = _.get(payload, "channelId");
+  const nickname = _.get(payload, "nickname");
+  const client = _.get(payload, "client");
+  const senderInfo = _.get(payload, "senderInfo");
 
   let command = _.get(methodObj, "name");
 
@@ -33,7 +31,10 @@ async function exec(methodObj, payload) {
     if (chat == null) {
       let type = _.get(methodObj, "params.type");
       let result = await axios.get(
-        `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/${command}/${type}`
+        `${_.get(config, "site.domain")}:${_.get(
+          config,
+          "site.port"
+        )}/api/v0/${command}/${type}`
       );
       if (result.status != 200) {
         return;
@@ -41,12 +42,12 @@ async function exec(methodObj, payload) {
 
       // 데이터는 api서버에서 rest형태로 보내줘야함.. 잘못된 형태로 구성해놓았음
       let data = _.get(result, "data");
-      chatEvent.emit('send', {
+      chatEvent.emit("send", {
         channelId,
-        type: 'chat',
+        type: "chat",
         data: data.payload.message,
         senderInfo,
-        client
+        client,
       });
     } else if (chat != null) {
       let type = _.get(methodObj, "params.type");
@@ -60,16 +61,19 @@ async function exec(methodObj, payload) {
       };
 
       let result = await axios.post(
-        `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/${command}/register`,
+        `${_.get(config, "site.domain")}:${_.get(
+          config,
+          "site.port"
+        )}/api/v0/${command}/register`,
         params
       );
       let data = _.get(result, "data");
-      chatEvent.emit('send', {
+      chatEvent.emit("send", {
         channelId,
-        type: 'chat',
+        type: "chat",
         data: data.payload.message,
         senderInfo,
-        client
+        client,
       });
     }
   } else if (command == COMMAND.HELP) {
@@ -87,12 +91,12 @@ async function exec(methodObj, payload) {
       // console.dir(e);
     }
 
-    chatEvent.emit('send', {
+    chatEvent.emit("send", {
       channelId,
-      type: 'chat',
+      type: "chat",
       data: result,
       senderInfo,
-      client
+      client,
     });
   }
 }

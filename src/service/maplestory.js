@@ -29,6 +29,7 @@ const COMMAND = {
   DAILY_QUEST: "dailyQuest",
   MONSTER_PARK: "monsterPark",
   SYMBOL_GROWTH: "symbolGrowth",
+  COOLDOWN: "cooldown",
 };
 
 async function exec(methodObj, payload) {
@@ -1035,6 +1036,80 @@ async function exec(methodObj, payload) {
         channelId,
         type: "chat",
         data: `${level}에서 몬스터파크 완료 시 ${raiseUpExp}% 상승`,
+        senderInfo,
+        client,
+      });
+      return;
+    } catch (e) {
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: e.response.data,
+        senderInfo,
+        client,
+      });
+      return;
+    }
+  } else if (command == COMMAND.COOLDOWN) {
+    if (chatLength < 2 || chatLength > 3) {
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: "잘못 입력하셨습니다.",
+        senderInfo,
+        client,
+      });
+      return;
+    }
+
+    // chat의 길이가1이면 익몬, 그외 2,3이면 일반 몬파
+    let url = `http://${_.get(config, "site.domain")}:${_.get(
+      config,
+      "site.port"
+    )}/api/v0/maplestory/util/cooldown`;
+
+    let cooldown = chatSplit[0];
+    let mercedes = chatSplit[1];
+    //모자 쿨타임은 0일수도있음
+    let hat = chatSplit[2] || 0;
+
+    cooldown = _.toNumber(cooldown);
+    if (_.isNaN(cooldown) || Math.sign(cooldown) != 1) {
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: "스킬 쿨타임을 잘못 입력하셨습니다.",
+        senderInfo,
+        client,
+      });
+      return;
+    }
+
+    hat = _.toNumber(hat);
+    if (_.isNaN(hat) || Math.sign(hat) != 1) {
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: "쿨뚝 수치를 입력하셨습니다.",
+        senderInfo,
+        client,
+      });
+      return;
+    }
+
+    let requestBody = {
+      cooldown,
+      mercedes,
+      hat,
+    };
+
+    try {
+      let response = await axios.post(url, requestBody);
+      let responseData = _.get(response, "data");
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: `${cooldown}초 스킬 쿨타임 계산 결과 : ${responseData}초`,
         senderInfo,
         client,
       });

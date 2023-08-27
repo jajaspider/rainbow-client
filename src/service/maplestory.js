@@ -268,7 +268,7 @@ async function exec(methodObj, payload) {
     chatEvent.emit("send", {
       channelId,
       type: "chat",
-      data: responseData.payload.percent,
+      data: responseData,
       senderInfo,
       client,
     });

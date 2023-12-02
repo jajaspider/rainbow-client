@@ -39,6 +39,8 @@ async function exec(methodObj, payload) {
             type = 'maplestory';
         } else if (chat == '로아' || chat == '로스트아크') {
             type = 'lostark';
+        } else if (chat == '방탈출') {
+            type = 'escape';
         }
 
         let result = await Room.find({
@@ -99,8 +101,7 @@ async function exec(methodObj, payload) {
                 return;
             }
         }
-    }
-    else if (command == COMMAND.NOTICE_ALARM) {
+    } else if (command == COMMAND.NOTICE_ALARM) {
         if (chat == null) {
             chatEvent.emit('send', {
                 channelId,
@@ -145,8 +146,7 @@ async function exec(methodObj, payload) {
                 client
             });
             return;
-        }
-        catch (e) {
+        } catch (e) {
             console.dir(e);
             chatEvent.emit('send', {
                 channelId,

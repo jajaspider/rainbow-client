@@ -22,17 +22,17 @@ class RabbitMQ {
             setup: (channel) => {
                 // `channel` here is a regular amqplib `ConfirmChannel`.
                 return Promise.all([
-                    channel.assertQueue('kakao', {
-                        durable: true
-                    }),
-                    channel.assertExchange('rainbow', 'topic'),
-                    channel.prefetch(1),
-                    channel.assertQueue('notice.maplestory', {
-                        durable: true
-                    }),
-                    channel.bindQueue('notice.maplestory', 'rainbow', 'notice'),
-                    channel.consume('notice.maplestory', mapleNoticeMessage)
-                ],
+                        channel.assertQueue('kakao', {
+                            durable: true
+                        }),
+                        channel.assertExchange('rainbow', 'topic'),
+                        channel.prefetch(1),
+                        channel.assertQueue('notice.maplestory', {
+                            durable: true
+                        }),
+                        channel.bindQueue('notice.maplestory', 'rainbow', 'notice'),
+                        channel.consume('notice.maplestory', mapleNoticeMessage)
+                    ],
                     [
                         channel.assertQueue('kakao', {
                             durable: true
@@ -44,6 +44,18 @@ class RabbitMQ {
                         }),
                         channel.bindQueue('notice.lostark', 'rainbow', 'notice'),
                         channel.consume('notice.lostark', loaNoticeMessage)
+                    ],
+                    [
+                        channel.assertQueue('kakao', {
+                            durable: true
+                        }),
+                        channel.assertExchange('rainbow', 'topic'),
+                        channel.prefetch(1),
+                        channel.assertQueue('notice.escape', {
+                            durable: true
+                        }),
+                        channel.bindQueue('notice.escape', 'rainbow', 'notice'),
+                        channel.consume('notice.escape', escapeNoticeMessage)
                     ]
                 )
             }
@@ -159,6 +171,50 @@ const loaNoticeMessage = async (data) => {
             });
             chatEvent.emit('send', {
                 channelId: lostarkRoom,
+                type: 'chat',
+                data,
+                client: 'discord'
+            });
+        }
+
+        rabbitMQ.channelWrapper.ack(data);
+        // channelWrapper.ack(data);
+    } catch (e) {
+        console.dir(e);
+    }
+}
+
+const escapeNoticeMessage = async (data) => {
+    try {
+        let message = JSON ``.parse(data.content.toString());
+        // console.dir(message);
+
+        let result = null;
+        result = await Room.find({
+            type: 'escape',
+            notice: true
+        });
+        result = util.toJson(result);
+
+        let escapeRooms = _.map(result, (resultObj) => {
+            return resultObj.id;
+        });
+        for (let _escapeRoom of escapeRooms) {
+            // console.dir(maplestoryRoom);
+            // chatEvent.emit('send', {
+            //     channelId,
+            //     type: 'chat',
+            //     data: "추가 성공"
+            // });
+            let data = `${message.title}\n${message.url}`;
+            chatEvent.emit('send', {
+                channelId: _escapeRoom,
+                type: 'chat',
+                data,
+                client: 'kakao-remote'
+            });
+            chatEvent.emit('send', {
+                channelId: _escapeRoom,
                 type: 'chat',
                 data,
                 client: 'discord'

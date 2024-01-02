@@ -143,19 +143,25 @@ async function exec(methodObj, payload) {
 
     let responseData = _.get(response, "data");
 
-    let nickName = _.get(responseData, "name");
+    let nickName = _.get(responseData, "character_name");
+    let pop = _.get(responseData, "popularity");
+    let job = _.get(responseData, "character_class");
+    let level = _.get(responseData, "character_level");
+    let exp = _.get(responseData, "character_exp_rate");
+    let guild = _.get(responseData, "character_guild_name");
     // let server = server;
-    let job = _.get(responseData, "class");
-    let level = _.get(responseData, "level");
-    let exp = _.get(responseData, "exp");
-    let pop = _.get(responseData, "pop");
-    let currentRanking = _.get(responseData, "ranking.current");
-    let changeRanking = _.get(responseData, "ranking.change");
-    let guild = _.get(responseData, "guild");
-    let dojangStair = _.get(responseData, "dojang.stair", "-");
-    let dojangTime = _.get(responseData, "dojang.time", "-");
-    let seedStair = _.get(responseData, "seed.stair", "-");
-    let seedTime = _.get(responseData, "seed.time", "-");
+
+    let finalStat = _.get(responseData, "final_stat");
+    let attackPower =
+      _.get(_.find(finalStat, { stat_name: "전투력" }), "stat_value") || 0;
+    let dojangStair = _.get(responseData, "dojang_best_floor");
+    let dojangTime = _.get(responseData, "dojang_best_time");
+
+    // let currentRanking = _.get(responseData, "ranking.current");
+    // let changeRanking = _.get(responseData, "ranking.change");
+
+    // let seedStair = _.get(responseData, "seed.stair", "-");
+    // let seedTime = _.get(responseData, "seed.time", "-");
 
     /*
       character_thumbnail: _.get(character, "img"),
@@ -166,9 +172,9 @@ async function exec(methodObj, payload) {
     let info = `${nickName}(${pop}) | ${job}\n`;
     info += `레벨 : ${level} - ${exp}%\n`;
     info += `길드 : ${guild}\n`;
-    info += `랭킹 : ${currentRanking}(${changeRanking})\n\n`;
-    info += `무릉도장 : ${dojangStair}층(${dojangTime})\n`;
-    info += `더시드 : ${seedStair}층(${seedTime})\n`;
+    info += `전투력 : ${attackPower}\n`;
+    // info += `랭킹 : ${currentRanking}(${changeRanking})\n\n`;
+    info += `무릉도장 : ${dojangStair}층(${dojangTime})`;
 
     chatEvent.emit("send", {
       channelId,
@@ -275,38 +281,41 @@ async function exec(methodObj, payload) {
   }
   // !무토
   else if (command == COMMAND.MUTO) {
-    chatEvent.emit("send", {
-      channelId,
-      type: "chat",
-      data: "미지원",
-      senderInfo,
-      client,
-    });
-    return;
+    // chatEvent.emit("send", {
+    //   channelId,
+    //   type: "chat",
+    //   data: "미지원",
+    //   senderInfo,
+    //   client,
+    // });
+    // return;
 
-    // if (chat == null || chatLength > 1) {
-    //     chatEvent.emit('send', {
-    //         channelId,
-    //         type: 'chat',
-    //         data: '잘못입력하셨습니다.',
-    //         senderInfo,
-    //         client
-    //     });
-    //     return;
-    // }
+    if (chat == null || chatLength > 1) {
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: "잘못입력하셨습니다.",
+        senderInfo,
+        client,
+      });
+      return;
+    }
 
-    // let url = `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/v0/images/muto/${encodeURIComponent(chat)}`;
-    // let response = await axios.get(url);
-    // if (response.status != 200) {
-    //     chatEvent.emit('send', {
-    //         channelId,
-    //         type: 'chat',
-    //         data: 'api 데이터 수신 실패',
-    //         senderInfo,
-    //         client
-    //     });
-    //     return;
-    // }
+    let url = `${_.get(config, "site.domain")}:${_.get(
+      config,
+      "site.port"
+    )}/api/v0/images/muto/${encodeURIComponent(chat)}`;
+    let response = await axios.get(url);
+    if (response.status != 200) {
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: "api 데이터 수신 실패",
+        senderInfo,
+        client,
+      });
+      return;
+    }
 
     // let responseData = _.get(response, "data");
     // let errorMessage = _.get(responseData, 'payload.message');
@@ -320,24 +329,31 @@ async function exec(methodObj, payload) {
     //     });
     // }
 
-    // let image = _.get(responseData, 'payload.image');
+    let image = _.get(response, "data.payload.image");
 
-    // let templateId = 72506;
-    // let templateArgs = {
-    //     imageUrl: `http://${_.get(config, 'site.domain')}:${_.get(config, 'site.port')}/api/${image.imageUrl.split("/")[0]}/${encodeURIComponent(image.imageUrl.split("/")[1])}`,
-    //     imageW: image.imageW,
-    //     imageH: image.imageH
-    // }
-    // if (client == 'kakao') {
-    //     chatEvent.emit('send', {
-    //         channelId,
-    //         type: 'kakaolink',
-    //         data: {
-    //             templateId,
-    //             templateArgs
-    //         },
-    //         client
-    //     });
+    let templateId = 100327;
+    let templateArgs = {
+      imageUrl: `${_.get(config, "site.domain")}:${_.get(
+        config,
+        "site.port"
+      )}/api/${image.imageUrl.split("/")[0]}/${encodeURIComponent(
+        image.imageUrl.split("/")[1]
+      )}`,
+      imageW: image.imageW,
+      imageH: image.imageH,
+    };
+    if (client == "kakao-remote") {
+      chatEvent.emit("send", {
+        channelId,
+        type: "kakaolink",
+        data: {
+          templateId,
+          templateArgs,
+        },
+        senderInfo,
+        client,
+      });
+    }
     // } else if (client == 'discord') {
     //     chatEvent.emit('send', {
     //         channelId,
@@ -431,21 +447,28 @@ async function exec(methodObj, payload) {
 
     let responseData = _.get(response, "data");
 
-    let nickName = _.get(responseData, "name");
-    let unionRanking = _.get(responseData, "unionRanking");
-    let unionLevel = _.get(responseData, "unionLevel");
-    let unionPower = _.get(responseData, "unionPower");
-    let unionCoinPerDay = _.get(responseData, "unionCoinPerDay");
+    for (let _data of responseData) {
+      let nickName = _.get(_data, "character_name");
+      let unionRanking = _.get(_data, "ranking");
+      let unionLevel = _.get(_data, "union_level");
+      let unionPower = _.get(_data, "union_power");
+      let unionCoinPerDay = Math.round((unionPower * 8.64) / 10000000);
 
-    let message = `[${nickName}님의 유니온 정보]\n랭킹 : ${unionRanking}\n레벨 : ${unionLevel}\n공격력 : ${unionPower}\n일일 코인 획득량 : ${unionCoinPerDay}`;
+      let message = `[${nickName}님의 유니온 정보]\n`;
+      message += `랭킹 : ${unionRanking}\n`;
+      message += `레벨 : ${unionLevel}\n`;
+      message += `공격력 : ${unionPower}\n`;
+      message += `일일 코인 획득량 : ${unionCoinPerDay}`;
 
-    chatEvent.emit("send", {
-      channelId,
-      type: "chat",
-      data: message,
-      senderInfo,
-      client,
-    });
+      chatEvent.emit("send", {
+        channelId,
+        type: "chat",
+        data: message,
+        senderInfo,
+        client,
+      });
+    }
+
     return;
   }
   // !이벤트

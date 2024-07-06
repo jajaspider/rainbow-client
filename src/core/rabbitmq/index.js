@@ -61,6 +61,18 @@ class RabbitMQ {
             }),
             channel.bindQueue("notice.themore", "rainbow", "notice"),
             channel.consume("notice.themore", themoreNoticeMessage),
+          ],
+          [
+            channel.assertQueue("kakao", {
+              durable: true,
+            }),
+            channel.assertExchange("rainbow", "topic"),
+            channel.prefetch(1),
+            channel.assertQueue("notice.financial", {
+              durable: true,
+            }),
+            channel.bindQueue("notice.financial", "rainbow", "notice"),
+            channel.consume("notice.financial", financialNoticeMessage),
           ]
         );
       },
@@ -195,6 +207,49 @@ const themoreNoticeMessage = async (data) => {
     let result = null;
     result = await Room.find({
       type: "themore",
+    });
+    result = util.toJson(result);
+
+    let themoreRooms = _.map(result, (resultObj) => {
+      return resultObj.id;
+    });
+    for (let _themoreRoom of themoreRooms) {
+      // console.dir(maplestoryRoom);
+      // chatEvent.emit('send', {
+      //     channelId,
+      //     type: 'chat',
+      //     data: "추가 성공"
+      // });
+      let data = `${message.title}\n${message.url}`;
+      chatEvent.emit("send", {
+        channelId: _themoreRoom,
+        type: "chat",
+        data,
+        client: "kakao-remote",
+      });
+      chatEvent.emit("send", {
+        channelId: _themoreRoom,
+        type: "chat",
+        data,
+        client: "discord",
+      });
+    }
+
+    rabbitMQ.channelWrapper.ack(data);
+    // channelWrapper.ack(data);
+  } catch (e) {
+    console.dir(e);
+  }
+};
+
+const financialNoticeMessage = async (data) => {
+  try {
+    let message = JSON.parse(data.content.toString());
+    // console.dir(message);
+
+    let result = null;
+    result = await Room.find({
+      type: "financial",
     });
     result = util.toJson(result);
 

@@ -6,6 +6,7 @@ const COMMAND = {
   ROOM_REGISTER: "roomRegister",
   NOTICE_ALARM: "noticeAlarm",
   ROOM_INFO: "roomInfo",
+  CREATE_NOTICE: "createNotice",
 };
 
 const util = require("../utils");
@@ -39,6 +40,8 @@ async function exec(methodObj, payload) {
       type = "lostark";
     } else if (chat == "더모아") {
       type = "themore";
+    } else if (chat == "재테크") {
+      type = "financial";
     }
 
     let result = await Room.find({
@@ -157,6 +160,61 @@ async function exec(methodObj, payload) {
         client,
       });
       return;
+    }
+  } else if (command == COMMAND.CREATE_NOTICE) {
+    // let result = await Room.find({
+    //   id: channelId,
+    // });
+    // result = util.toJson(result);
+
+    // chatEvent.emit("send", {
+    //   channelId,
+    //   type: "chat",
+    //   data: JSON.stringify(result),
+    //   senderInfo,
+    //   client,
+    // });
+
+    console.dir(chat);
+
+    const index = chat.indexOf(" ");
+    let roomType, rest;
+    if (index !== -1) {
+      roomType = chat.substring(0, index);
+      rest = chat.substring(index + 1);
+    } else {
+      roomType = chat;
+      rest = "";
+    }
+
+    if (!_.isEmpty(roomType)) {
+      let rooms = await Room.find({ type: roomType });
+      rooms = util.toJson(rooms);
+
+      let typeRooms = _.map(rooms, (_room) => {
+        return _room.id;
+      });
+      for (let _typeRoom of typeRooms) {
+        // console.dir(maplestoryRoom);
+        // chatEvent.emit('send', {
+        //     channelId,
+        //     type: 'chat',
+        //     data: "추가 성공"
+        // });
+        let data = `${rest}`;
+        chatEvent.emit("send", {
+          channelId: _typeRoom,
+          type: "chat",
+          data,
+          client: "kakao-remote",
+        });
+        chatEvent.emit("send", {
+          channelId: _typeRoom,
+          type: "chat",
+          data,
+          client: "discord",
+        });
+      }
     }
   }
   //debug

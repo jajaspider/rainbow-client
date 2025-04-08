@@ -103,14 +103,14 @@ async function exec(methodObj, payload) {
     let result = await axios.post(
       `http://192.168.50.66:11434/api/generate`,
       {
+        "model": "gemma3:27b",
+        "prompt": chat,
+        "stream": false
+      },
+      {
         headers: {
-          "Content-Type": "application/json",
-        },
-        data: {
-          "model": "gemma3:27b",
-          "prompt": chat,
-          "stream": false
-        },
+          "Content-Type": "application/json"
+        }
       }
     );
 

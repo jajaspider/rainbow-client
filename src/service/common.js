@@ -14,6 +14,7 @@ let config = yaml.load(fs.readFileSync(configPath));
 const COMMAND = {
   SELECTION: "selection",
   HELP: "help",
+  AI: "ai",
 };
 
 async function exec(methodObj, payload) {
@@ -95,6 +96,30 @@ async function exec(methodObj, payload) {
       channelId,
       type: "chat",
       data: result,
+      senderInfo,
+      client,
+    });
+  } else if (command == COMMAND.AI) {
+    let result = await axios.post(
+      `http://192.168.50.66:11434/api/generate`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {
+          "model": "gemma3:27b",
+          "prompt": chat,
+          "stream": false
+        },
+      }
+    );
+
+    let data = _.get(result, "data");
+
+    chatEvent.emit("send", {
+      channelId,
+      type: "chat",
+      data: data.response,
       senderInfo,
       client,
     });
